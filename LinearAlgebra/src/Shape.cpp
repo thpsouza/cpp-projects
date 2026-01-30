@@ -6,7 +6,7 @@
 
 namespace linalg {
     /// Constructors
-    Shape::Shape() {
+    Shape::Shape() : rows(0), cols(0), N(0) {
     }
 
     Shape::Shape(size_t rows, size_t cols) : rows(rows), cols(cols), N(rows*cols)

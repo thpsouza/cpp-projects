@@ -32,7 +32,7 @@ namespace linalg {
          * @brief Default constructor. Creates empty vector.
          */
         Vector();
-    
+        
         /**
          * @brief Constructs a vector .
          * Creates a column vector (Nx1). Initialize all values to zero.
@@ -40,7 +40,7 @@ namespace linalg {
          * @param N Number of elements in the vector
          */
         Vector(size_t N);
-
+        
         /**
          * @brief Constructs vector from values.
          * Creates a column vector (Nx1) from the provided values.
@@ -48,12 +48,14 @@ namespace linalg {
          * @param values Vector of elements
          */
         explicit Vector(std::vector<T> values);
-
+        
         /**
          * @brief Constructs a vector from initializer list.
          * @param values Initializer list
          */
         Vector(std::initializer_list<T> values);
+        
+        Vector(Matrix<T>&& matrix);
 
         /**
          * @brief set the size of the vector to new total number of elements.
@@ -61,12 +63,80 @@ namespace linalg {
          */
         void setSize(size_t N);
         
+
+        // ========== OPERATORS: ASSIGNMENT ==========
         /**
          * @brief Assignment operator.
          * @param B Value to assign to all positions in vector
          * @return Reference to this vector
          */
         Vector<T>& operator=(T x);
+        
+        /**
+         * @brief In-place element-wise addition.
+         * @param B Matrix to add
+         * @return Reference to this matrix
+         */
+        Vector<T>& operator+=(const Vector<T>& B);
+        
+        /**
+         * @brief In-place element-wise subtraction.
+         * @param B Vector to subtract
+         * @return Reference to this matrix
+         */
+        Vector<T>& operator-=(const Vector<T>& B);
+        
+        /**
+         * @brief In-place element-wise multiplication.
+         * @param B Vector to multiply
+         * @return Reference to this matrix
+         */
+        Vector<T>& operator*=(const Vector<T>& B);
+        
+        /**
+         * @brief In-place element-wise division.
+         * @param B Vector to divide by
+         * @return Reference to this matrix
+         */
+        Vector<T>& operator/=(const Vector<T>& B);
+
+
+        // ========== OPERATORS: SCALAR ==========
+        /**
+         * @brief Element-wise addition with scalar.
+         * @param x Scalar to add
+         * @return New vector with x added to each element
+         */
+        Vector<T> operator+(T x) const;
+        
+        /**
+         * @brief Element-wise subtraction with scalar.
+         * @param x Scalar to subtract
+         * @return New vector with x subtracted from each element
+         */
+        Vector<T> operator-(T x) const;
+        
+        /**
+         * @brief Element-wise multiplication with scalar.
+         * @param x Scalar to multiply
+         * @return New vector with each element multiplied by x
+         */
+        Vector<T> operator*(T x) const;
+        
+        /**
+         * @brief Element-wise division with scalar.
+         * @param x Scalar to divide by
+         * @return New vector with each element divided by x
+         * @throw DivisionByZero if x is zero
+         */
+        Vector<T> operator/(T x) const;
+
+
+        // ========== OPERATORS: MATRIX-MATRIX ==========
+        Vector<T> operator+(const Vector<T>& B) const;
+        Vector<T> operator-(const Vector<T>& B) const;
+        Vector<T> operator*(const Vector<T>& B) const;
+        Vector<T> operator/(const Vector<T>& B) const;
     };
 }
 

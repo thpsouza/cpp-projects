@@ -361,16 +361,45 @@ namespace linalg {
         if (A.shape.cols != B.shape.rows) {
             throw MismatchedShapes(A.shape, B.shape);
         }
-        Matrix<T> result(A.shape.rows, B.shape.cols);
-        for (size_t i=0; i<A.shape.rows; i++) {
-            for (size_t j=0; j<A.shape.cols; j++) {
-                for (size_t k=0; k<B.shape.cols; k++) {
-                    result(i,j) += A(i,k) * B(k,j);
+        // Caches
+        const T* A_ptr = A.values.data();
+        size_t A_rows = A.shape.rows;
+        size_t A_cols = A.shape.cols;
+        const T* B_ptr = B.values.data();
+        size_t B_cols = B.shape.cols;
+        Matrix<T> result(A_rows, B_cols);
+        T* result_ptr = result.values.data();
+        // Looping first through A matrix
+        for (size_t i=0; i<A_rows; i++) {
+            for (size_t k=0; k<A_cols; k++) {
+                T A_ik = A_ptr[i*A_cols + k];     
+                // Internal loop with sequential acesses in memory (only j changes)
+                for (size_t j=0; j<B_cols; j++) {
+                    result_ptr[i*B_cols + j] += A_ik * B_ptr[k*B_cols + j];
                 }
             }
         }
         return result;
     }
+
+    // template <typename T>
+    // Matrix<T> Matrix<T>::dot2(const Matrix<T> &A, const Matrix<T> &B) {
+    //     if (A.shape.cols != B.shape.rows) {
+    //         throw MismatchedShapes(A.shape, B.shape);
+    //     }
+    //     size_t A_cols = A.shape.cols;
+    //     size_t B_cols = B.shape.cols;
+    //     size_t A_rows = A.shape.rows;
+    //     Matrix<T> result(A_rows, B_cols);
+    //     for (size_t i=0; i<A_rows; i++) {
+    //         for (size_t j=0; j<A_cols; j++) {
+    //             for (size_t k=0; k<B_cols; k++) {
+    //                 result(i,j) += A(i,k) * B(k,j);
+    //             }
+    //         }
+    //     }
+    //     return result;
+    // }
 
     template <typename T>
     Matrix<T> Matrix<T>::dot(const Matrix<T> &B) const {
@@ -488,15 +517,19 @@ namespace linalg {
     // Matrix assign operations
     template <typename T>
     Matrix<T> &Matrix<T>::operator=(const Matrix<T> &B) {
-        // Guard self assignment
-        if (this == &B) {
-            return *this;
+        if (this != &B) {
+            shape = B.shape;
+            values = B.values;
         }
-        // Guard different shape matrices
-        if (shape != B.shape) {
-            throw MismatchedShapes(shape, B.shape);
+        return *this;
+    }
+
+    template <typename T>
+    Matrix<T> &Matrix<T>::operator=(Matrix<T> &&B) noexcept {
+        if (this != &B) {
+            shape = std::move(B.shape);
+            values = std::move(B.values);
         }
-        values = B.values;
         return *this;
     }
 

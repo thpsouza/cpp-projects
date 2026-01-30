@@ -27,6 +27,10 @@ namespace linalg {
         this->setShape(values.size(), 1);
     }
 
+    template <typename T> 
+    Vector<T>::Vector(Matrix<T> &&matrix) : Matrix<T>(std::move(other)) { 
+    }
+
     // Methods
     template <typename T>
     void Vector<T>::setSize(size_t N) {
@@ -34,10 +38,63 @@ namespace linalg {
         this->setShape(N, 1);
     }
 
-    // Operators
+    // ========== OPERATORS: ASSIGNMENT ==========
     template <typename T>
-    Vector<T> &Vector<T>::operator=(T x) {
-        Matrix<T>::operator=(x);
-        return *this;
+    Vector<T>& Vector<T>::operator=(T x) {
+        return Vector<T>(Matrix<T>::operator=(x));
     }
+    template <typename T>
+    Vector<T> &Vector<T>::operator+=(const Vector<T> &B) {
+        return Vector<T>(Matrix<T>::operator+=(B));
+    }
+    template <typename T>
+    Vector<T> &Vector<T>::operator-=(const Vector<T> &B) {
+        return Vector<T>(Matrix<T>::operator-=(B));
+    }
+    template <typename T>
+    Vector<T> &Vector<T>::operator*=(const Vector<T> &B) {
+        return Vector<T>(Matrix<T>::operator*=(B));
+    }
+    template <typename T>
+    Vector<T> &Vector<T>::operator/=(const Vector<T> &B) {
+        return Vector<T>(Matrix<T>::operator/=(B));
+    }
+
+    // ========== OPERATORS: SCALAR ==========
+    template <typename T>
+    Vector<T> Vector<T>::operator+(T x) const {
+        return Vector<T>(Matrix<T>::operator+(x));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator-(T x) const {
+        return Vector<T>(Matrix<T>::operator-(x));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator*(T x) const {
+        return Vector<T>(Matrix<T>::operator*(x));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator/(T x) const {
+        return Vector<T>(Matrix<T>::operator/(x));
+    }
+    
+
+    // ========== OPERATORS: MATRIX-MATRIX ==========
+    template <typename T>
+    Vector<T> Vector<T>::operator+(const Vector<T>& B) const {
+        return Vector<T>(Matrix<T>::operator+(B));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator-(const Vector<T>& B) const {
+        return Vector<T>(Matrix<T>::operator-(B));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator*(const Vector<T>& B) const {
+        return Vector<T>(Matrix<T>::operator*(B));
+    }
+    template <typename T>
+    Vector<T> Vector<T>::operator/(const Vector<T>& B) const {
+        return Vector<T>(Matrix<T>::operator/(B));
+    }
+
 }

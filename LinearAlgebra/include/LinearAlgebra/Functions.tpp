@@ -4,8 +4,8 @@
 
 #include "Functions.h"
 #include "Matrix.h"
+#include "Vector.h"
 #include <cmath>
-#include <algorithm>
 //#include <functional>
 //std::vector<double> transform(std::vector<double> x, std::function<double(double)> f) {
 //    std::vector<double> ret(x.size());
@@ -17,20 +17,71 @@ namespace linalg {
 
     template <typename T>
     Matrix<T> exp(const Matrix<T>& m) {
-        std::vector<T> values = m.getElements();
-        Matrix<T> temp(m.getShape());
-        std::transform(values.begin(), values.end(), temp.getElements().begin(),
-                    [](T x){ return std::exp(x);});
-        return temp;
+        Matrix<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::exp(values[i]);
+        }
+        // std::transform(values.begin(), values.end(), result.getElements().begin(),
+        //             [](T x){ return std::exp(x);});
+        return result;
     }
 
     template <typename T>
     Matrix<T> pow(const Matrix<T>& m, T n) {
-        std::vector<T> values = m.getElements();
-        Matrix<T> temp(m.getShape());
-        std::transform(values.begin(), values.end(), temp.getElements().begin(),
-                    [&](T x){ return std::pow(x, n);});
-        return temp;
+        Matrix<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::pow(values[i], n);
+        }
+        return result;
+    }
+    
+    template <typename T>
+    Matrix<T> pow(const Matrix<T>& m, int n) {
+        Matrix<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::pow(values[i], n);
+        }
+        return result;
+    }
+
+
+    template <typename T>
+    Vector<T> exp(const Vector<T>& m) {
+        Vector<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::exp(values[i]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Vector<T> pow(const Vector<T>& m, T n) {
+        Vector<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::pow(values[i], n);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Vector<T> pow(const Vector<T>& m, int n) {
+        Vector<T> result(m.getShape());
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values = m.getElements();
+        for (size_t i = 0; i < values.size(); i++) {
+            temp[i] = std::pow(values[i], n);
+        }
+        return result;
     }
     
 }

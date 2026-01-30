@@ -41,7 +41,7 @@ namespace linalg {
     protected:
         Shape shape;
         std::vector<T> values;
-        bool is_transposed = false;
+        // bool is_transposed = false;
 
     private:
         enum OperationType {ADD, SUB, MUL, DIV};
@@ -66,6 +66,9 @@ namespace linalg {
          */
         Matrix() = default;
         
+        Matrix(const Matrix& other) = default;
+        Matrix(Matrix&& other) noexcept = default;
+
         /**
          * @brief Constructs column vector from flat values.
          * Creates an Nx1 matrix from the provided values.
@@ -326,6 +329,7 @@ namespace linalg {
          * @throw MismatchedShapes if A.cols != B.rows
          */
         static Matrix<T> dot(const Matrix<T>& A, const Matrix<T>& B);
+        // static Matrix<T> dot2(const Matrix<T>& A, const Matrix<T>& B);
         
         /**
          * 
@@ -457,6 +461,7 @@ namespace linalg {
          * @return Reference to this matrix
          */
         Matrix<T>& operator=(const Matrix<T>& B);
+        Matrix<T>& operator=(Matrix<T>&& B) noexcept;
         
         /**
          * @brief In-place element-wise addition.
