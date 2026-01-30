@@ -11,9 +11,7 @@ dist/
 *.out
 
 # VS Code
-.vscode/settings.json
-.vscode/launch.json
-.vscode/tasks.json
+.vscode/
 
 # IDE
 .idea/
