@@ -72,6 +72,12 @@ namespace linalg {
          * @param N new number of elements
          */
         void setSize(size_t N);
+
+        /**
+         * @brief Gets the number of elements of the vector.
+         * @return Number of elements of the vector.
+         */
+        size_t getSize() const; 
         
         
         // ========== OPERATORS: ASSIGNMENT ==========

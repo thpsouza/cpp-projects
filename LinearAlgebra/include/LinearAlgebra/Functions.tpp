@@ -52,10 +52,10 @@ namespace linalg {
 
 
     template <typename T>
-    Vector<T> exp(const Vector<T>& m) {
-        Vector<T> result(m.getShape());
+    Vector<T> exp(const Vector<T>& v) {
+        Vector<T> result(v.getSize());
         std::vector<T>& temp = result.getElements();
-        const std::vector<T>& values = m.getElements();
+        const std::vector<T>& values = v.getElements();
         for (size_t i = 0; i < values.size(); i++) {
             temp[i] = std::exp(values[i]);
         }
@@ -63,10 +63,10 @@ namespace linalg {
     }
 
     template <typename T>
-    Vector<T> pow(const Vector<T>& m, T n) {
-        Vector<T> result(m.getShape());
+    Vector<T> pow(const Vector<T>& v, T n) {
+        Vector<T> result(v.getSize());
         std::vector<T>& temp = result.getElements();
-        const std::vector<T>& values = m.getElements();
+        const std::vector<T>& values = v.getElements();
         for (size_t i = 0; i < values.size(); i++) {
             temp[i] = std::pow(values[i], n);
         }
@@ -74,10 +74,10 @@ namespace linalg {
     }
 
     template <typename T>
-    Vector<T> pow(const Vector<T>& m, int n) {
-        Vector<T> result(m.getShape());
+    Vector<T> pow(const Vector<T>& v, int n) {
+        Vector<T> result(v.getSize());
         std::vector<T>& temp = result.getElements();
-        const std::vector<T>& values = m.getElements();
+        const std::vector<T>& values = v.getElements();
         for (size_t i = 0; i < values.size(); i++) {
             temp[i] = std::pow(values[i], n);
         }

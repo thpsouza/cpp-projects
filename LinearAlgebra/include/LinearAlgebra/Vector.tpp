@@ -48,6 +48,11 @@ namespace linalg {
         this->setShape(N, 1);
     }
 
+    template <typename T> 
+    size_t Vector<T>::getSize() const {
+        return this->getShape().N;
+    }
+
     // ========== OPERATORS: ASSIGNMENT ==========
     template <typename T>
     Vector<T>& Vector<T>::operator=(T x) {
