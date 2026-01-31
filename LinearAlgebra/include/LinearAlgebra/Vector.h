@@ -6,6 +6,7 @@
 #define LINALG_CST_LIB_VECTOR_H
 
 #include "Matrix.h"
+#include "Shape.h"
 
 namespace linalg {
     /**
@@ -55,15 +56,24 @@ namespace linalg {
          */
         Vector(std::initializer_list<T> values);
         
+        /**
+         * @brief Constructs a vector from a Shape.
+         * @param shape Dimensions (must be Nx1)
+         */
+        Vector(const Shape& shape);
+
+
         Vector(Matrix<T>&& matrix);
 
+
+        // ========== METHODS ============
         /**
          * @brief set the size of the vector to new total number of elements.
          * @param N new number of elements
          */
         void setSize(size_t N);
         
-
+        
         // ========== OPERATORS: ASSIGNMENT ==========
         /**
          * @brief Assignment operator.
@@ -132,7 +142,7 @@ namespace linalg {
         Vector<T> operator/(T x) const;
 
 
-        // ========== OPERATORS: MATRIX-MATRIX ==========
+        // ========== OPERATORS: VECTOR-VECTOR ==========
         Vector<T> operator+(const Vector<T>& B) const;
         Vector<T> operator-(const Vector<T>& B) const;
         Vector<T> operator*(const Vector<T>& B) const;

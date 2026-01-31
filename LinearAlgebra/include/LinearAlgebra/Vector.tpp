@@ -27,8 +27,18 @@ namespace linalg {
         this->setShape(values.size(), 1);
     }
 
+    template <typename T>
+    Vector<T>::Vector(const Shape& shape) : Matrix<T>(shape) {
+        if (shape.cols != 1 && shape.N != 0) {
+            throw MismatchedShapes(shape, Shape(shape.rows, 1));
+        }
+    }
+
     template <typename T> 
     Vector<T>::Vector(Matrix<T> &&matrix) : Matrix<T>(std::move(matrix)) { 
+        if (this->shape.cols != 1 && this->shape.N != 0) {
+            throw MismatchedShapes(this->shape, Shape(this->shape.rows, 1));
+    }
     }
 
     // Methods
@@ -79,7 +89,7 @@ namespace linalg {
     }
     
 
-    // ========== OPERATORS: MATRIX-MATRIX ==========
+    // ========== OPERATORS: VECTOR-VECTOR ==========
     template <typename T>
     Vector<T> Vector<T>::operator+(const Vector<T>& B) const {
         return Vector<T>(Matrix<T>::operator+(B));
