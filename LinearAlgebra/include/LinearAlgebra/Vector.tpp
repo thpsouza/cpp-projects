@@ -28,7 +28,7 @@ namespace linalg {
     }
 
     template <typename T> 
-    Vector<T>::Vector(Matrix<T> &&matrix) : Matrix<T>(std::move(other)) { 
+    Vector<T>::Vector(Matrix<T> &&matrix) : Matrix<T>(std::move(matrix)) { 
     }
 
     // Methods
