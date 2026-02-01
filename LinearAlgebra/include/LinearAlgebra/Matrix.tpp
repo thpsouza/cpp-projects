@@ -24,6 +24,13 @@ namespace linalg {
     }
 
     template <typename T>
+    Matrix<T>::Matrix(size_t value, size_t rows, size_t cols) :
+        shape(rows, cols),
+        values(rows*cols, value)
+    {
+    }
+
+    template <typename T>
     Matrix<T>::Matrix(Shape shape) :
         shape(shape),
         values(shape.N, 0)
@@ -85,6 +92,22 @@ namespace linalg {
             throw IndexError(i, shape);
         }
         values[i] = newElement;
+    }
+
+    template <typename T> void Matrix<T>::setElements(std::vector<T> values) {
+        resize(1, values.size());
+        this->values = std::move(values);
+    }
+
+    template <typename T>
+    void Matrix<T>::setElements(std::initializer_list<T> values) {
+        resize(1, values.size());
+        this->values = std::move(values);
+    }
+    
+    template <typename T>
+    void Matrix<T>::setElements(std::initializer_list<std::initializer_list<T>> values) {
+        *this = Matrix<T>(values);
     }
 
     template <typename T>

@@ -42,6 +42,18 @@ namespace linalg {
     }
 
     // Methods
+    template <typename T> 
+    void Vector<T>::setElements(std::vector<T> values) {
+        setSize(values.size());
+        this->values = std::move(values);
+    }
+    
+    template <typename T>
+    void Vector<T>::setElements(std::initializer_list<T> values) {
+        setSize(values.size());
+        this->values = std::move(values);
+    }
+
     template <typename T>
     void Vector<T>::setSize(size_t N) {
         this->resize(N, 1);

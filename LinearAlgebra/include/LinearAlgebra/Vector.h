@@ -67,6 +67,9 @@ namespace linalg {
 
 
         // ========== METHODS ============
+        void setElements(std::vector<T> values);
+        void setElements(std::initializer_list<T> values);
+
         /**
          * @brief set the size of the vector to new total number of elements.
          * @param N new number of elements

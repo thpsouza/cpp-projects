@@ -41,7 +41,6 @@ namespace linalg {
     protected:
         Shape shape;
         std::vector<T> values;
-        // bool is_transposed = false;
 
     private:
         enum OperationType {ADD, SUB, MUL, DIV};
@@ -76,6 +75,7 @@ namespace linalg {
          */
         explicit Matrix(std::vector<T> values);
         
+        
         /**
          * @brief Constructs matrix with given dimensions.
          * Initializes all elements to zero.
@@ -83,6 +83,8 @@ namespace linalg {
          * @param cols Number of columns
          */
         Matrix(size_t rows, size_t cols);
+        Matrix(size_t value, size_t rows, size_t cols);
+        
         
         /**
          * @brief Constructs matrix from Shape object.
@@ -140,6 +142,10 @@ namespace linalg {
          */
         void setElement(T newElement, size_t i);
         
+        void setElements(std::vector<T> values);
+        void setElements(std::initializer_list<T> values);
+        void setElements(std::initializer_list<std::initializer_list<T>> values);
+
         /**
          * @brief Reshapes matrix to new dimensions.
          * Total element count must remain constant.
