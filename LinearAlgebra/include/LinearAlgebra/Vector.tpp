@@ -11,20 +11,24 @@ namespace linalg {
     template <typename T>
     Vector<T>::Vector() : Matrix<T>() {
         // this->shape.cols = 1;
+        this->class_name = "Vector";
     }    
     
     template <typename T>
     Vector<T>::Vector(size_t N) : Matrix<T>(N, 1) {
+        this->class_name = "Vector";
     }
 
     template <typename T>
     Vector<T>::Vector(std::vector<T> values) : Matrix<T>(std::move(values)) {
         this->setShape(values.size(), 1);
+        this->class_name = "Vector";
     }
 
     template <typename T>
     Vector<T>::Vector(std::initializer_list<T> values) : Matrix<T>(values) {
         this->setShape(values.size(), 1);
+        this->class_name = "Vector";
     }
 
     template <typename T>
@@ -32,13 +36,15 @@ namespace linalg {
         if (shape.cols != 1 && shape.N != 0) {
             throw MismatchedShapes(shape, Shape(shape.rows, 1));
         }
+        this->class_name = "Vector";
     }
 
     template <typename T> 
     Vector<T>::Vector(Matrix<T> &&matrix) : Matrix<T>(std::move(matrix)) { 
         if (this->shape.cols != 1 && this->shape.N != 0) {
             throw MismatchedShapes(this->shape, Shape(this->shape.rows, 1));
-    }
+        }
+        this->class_name = "Vector";
     }
 
     // Methods
@@ -70,6 +76,20 @@ namespace linalg {
     Vector<T>& Vector<T>::operator=(T x) {
         return Vector<T>(Matrix<T>::operator=(x));
     }
+    template <typename T>
+    Vector<T>& Vector<T>::operator=(std::initializer_list<T> x) {
+        this->Matrix<T>::operator=(x);
+        this->setSize(x.size());
+        return *this;
+    }
+    // template <typename T>
+    // Vector<T>& Vector<T>::operator=(const Vector<T>& B) {
+    //     return Vector<T>(Matrix<T>::operator=(B));
+    // }
+    // template <typename T>
+    // Vector<T>& Vector<T>::operator=(Vector<T> &&B) noexcept {
+    //     return Vector<T>(Matrix<T>::operator=(B));
+    // }
     template <typename T>
     Vector<T> &Vector<T>::operator+=(const Vector<T> &B) {
         return Vector<T>(Matrix<T>::operator+=(B));

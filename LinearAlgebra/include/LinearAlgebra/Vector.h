@@ -27,7 +27,7 @@ namespace linalg {
         using Matrix<T>::setShape;
         using Matrix<T>::resize;
     public:
-        using Matrix<T>::operator=;
+        // using Matrix<T>::operator=;
 
         /**
          * @brief Default constructor. Creates empty vector.
@@ -86,10 +86,13 @@ namespace linalg {
         // ========== OPERATORS: ASSIGNMENT ==========
         /**
          * @brief Assignment operator.
-         * @param B Value to assign to all positions in vector
+         * @param x Value to assign to all positions in vector
          * @return Reference to this vector
          */
         Vector<T>& operator=(T x);
+        Vector<T>& operator=(std::initializer_list<T> x);
+        // Vector<T>& operator=(const Vector<T> &B);
+        // Vector<T>& operator=(Vector<T> &&B) noexcept;
         
         /**
          * @brief In-place element-wise addition.
