@@ -5,14 +5,9 @@
 #ifndef LINALG_CST_LIB_H
 #define LINALG_CST_LIB_H
 
+#include "LinAlgFwds.h"
 #include "Matrix.h"
 #include "Vector.h"
 #include "Functions.h"
-
-using precision = float; // changeable to double if needed
-
-using Matrix = linalg::Matrix<precision>;
-using Vector = linalg::Vector<precision>;
-using Shape  = linalg::Shape;
 
 #endif //LINALG_CST_LIB_H
