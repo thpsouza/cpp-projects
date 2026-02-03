@@ -11,6 +11,8 @@ build/
 dist/
 *.out
 
+*.txt
+
 # VS Code
 .vscode/
 
