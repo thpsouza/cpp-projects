@@ -1,10 +1,14 @@
 #ifndef NN_MODEL_BASE_ACTIVATION_FUN_H
 #define NN_MODEL_BASE_ACTIVATION_FUN_H
 
-#include <LinearAlgebra/LinAlg.h>
-#include <string.h>
+// Standard lib includes
+#include <vector>
+#include <string>
 
+// Forward declarations
+class Matrix;
 
+// Implementation
 class BaseActivationFunction {
 public:
     BaseActivationFunction();

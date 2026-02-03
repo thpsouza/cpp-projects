@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/ActivationFunctions/ReLUActivationFunction.h>
+#include <LinearAlgebra/LinAlg.h>
 
 
 std::string ReLUActivationFunction::getName() const {

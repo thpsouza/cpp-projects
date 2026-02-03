@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/ActivationFunctions/TanhActivationFunction.h>
+#include <LinearAlgebra/LinAlg.h>
 #include <cmath>
 
 

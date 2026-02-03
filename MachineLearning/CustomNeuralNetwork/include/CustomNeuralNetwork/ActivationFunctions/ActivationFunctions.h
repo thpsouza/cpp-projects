@@ -1,6 +1,7 @@
 #ifndef NN_MODEL_ACTIVATION_FUNCTIONS_H
 #define NN_MODEL_ACTIVATION_FUNCTIONS_H
 
+#include <memory>
 #include "BaseActivationFunction.h"
 #include "SigmoidActivationFunction.h"
 #include "ReLUActivationFunction.h"

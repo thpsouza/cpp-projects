@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/ActivationFunctions/BaseActivationFunction.h>
+#include <LinearAlgebra/LinAlg.h>
 
 
 // Constructor/Destructor 
