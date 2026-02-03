@@ -7,7 +7,7 @@ A collection of C++ projects focusing on **Linear Algebra** and **Machine Learni
 ```
 cpp-projects/
 ├── README.md
-├── build.ps1                          (Build script - PowerShell)
+├── build.ps1                          (Build script)
 ├── main.cpp                           (Entry point)
 ├── LinearAlgebra/
 │   ├── README.md
@@ -19,41 +19,62 @@ cpp-projects/
 │   │       ├── Shape.h                (PUBLIC - Shape class)
 │   │       └── Functions.h            (PUBLIC - utility functions)
 │   └── src/
-│       ├── Shape.cpp
+│       └── Shape.cpp
 │
-└── MachineLearning/
-    └── CustomNeuralNetwork/
-        ├── README.md
-        ├── include/
-        │   └── CustomNeuralNetwork/
-        │       ├── NN.h                       (Main NN class)
-        │       ├── ActivationFunctions/
-        │       │   ├── ActivationFunctions.h
-        │       │   ├── BaseActivationFunction.h
-        │       │   ├── ReLUActivationFunction.h
-        │       │   ├── SigmoidActivationFunction.h
-        │       │   └── TanhActivationFunction.h
-        │       ├── LossFunctions/
-        │       │   ├── LossFunctions.h
-        │       │   ├── BaseLossFunction.h
-        │       │   └── MeanSquaredErrorLossFunction.h
-        │       └── Optimizers/
-        │           ├── Optimizers.h
-        │           ├── BaseOptimizer.h
-        │           └── StochasticGDOptimizer.h
-        └── src/
-            ├── NN.cpp
-            ├── ActivationFunctions/
-            │   ├── BaseActivationFunction.cpp
-            │   ├── ReLUActivationFunction.cpp
-            │   ├── SigmoidActivationFunction.cpp
-            │   └── TanhActivationFunction.cpp
-            ├── LossFunctions/
-            │   ├── BaseLossFunction.cpp
-            │   └── MeanSquaredErrorLossFunction.cpp
-            └── Optimizers/
-                ├── BaseOptimizer.cpp
-                └── StochasticGDOptimizer.cpp
+├── MachineLearning/
+│    └── CustomNeuralNetwork/
+│        ├── README.md
+│        ├── include/
+│        │   └── CustomNeuralNetwork/
+│        │       ├── NN.h                       (Main NN class)
+│        │       ├── DenseLayer.h
+│        │       ├── ActivationFunctions/
+│        │       │   ├── ActivationFunctions.h
+│        │       │   ├── BaseActivationFunction.h
+│        │       │   ├── ReLUActivationFunction.h
+│        │       │   ├── SigmoidActivationFunction.h
+│        │       │   └── TanhActivationFunction.h
+│        │       ├── InitializationFunctions/
+│        │       │   ├── InitializationFunctions.h
+│        │       │   ├── BaseInitializationFunction.h
+│        │       │   ├── HeInitializationFunction.h
+│        │       │   └── XavierInitializationFunction.h
+│        │       ├── LossFunctions/
+│        │       │   ├── LossFunctions.h
+│        │       │   ├── BaseLossFunction.h
+│        │       │   └── MeanSquaredErrorLossFunction.h
+│        │       └── Optimizers/
+│        │           ├── Optimizers.h
+│        │           ├── BaseOptimizer.h
+│        │           ├── AdaptativeMomentOptimizer.cpp (NOT IMPLEMENTED YET)
+│        │           └── StochasticGDOptimizer.h
+│        └── src/
+│            ├── NN.cpp
+│            ├── DenseLayer.cpp
+│            ├── ActivationFunctions/
+│            │   ├── BaseActivationFunction.cpp
+│            │   ├── ReLUActivationFunction.cpp
+│            │   ├── SigmoidActivationFunction.cpp
+│            │   └── TanhActivationFunction.cpp
+│            │       ├── InitializationFunctions/
+│            │       │   ├── BaseInitializationFunction.cpp
+│            │       │   ├── HeInitializationFunction.cpp
+│            │       │   └── XavierInitializationFunction.cpp
+│            ├── LossFunctions/
+│            │   ├── BaseLossFunction.cpp
+│            │   └── MeanSquaredErrorLossFunction.cpp
+│            └── Optimizers/
+│                ├── BaseOptimizer.cpp
+│                ├── AdaptativeMomentOptimizer.cpp (NOT IMPLEMENTED YET)
+│                └── StochasticGDOptimizer.cpp
+└── Utils/
+    ├── include/
+    │   ├── utils.h
+    │   ├── Utils/       
+    │   │   ├── benchmark.h
+    │   │   └── print.h
+    └── src/
+        └── benchmark.cpp
 ```
 
 ## 🚀 Quick Start
@@ -82,8 +103,8 @@ cd cpp-projects
 D:/msys64/clang64/bin/clang++.exe -std=c++20 -O3 `
   -I./LinearAlgebra/include `
   -I./MachineLearning/CustomNeuralNetwork/include `
-  -I./MachineLearning/CustomNeuralNetwork/src `
-  (Get-ChildItem -Path './LinearAlgebra/src', './MachineLearning/CustomNeuralNetwork/src' -Filter '*.cpp' -Recurse | ForEach-Object { $_.FullName }) `
+  -I./Utils/include `
+  (Get-ChildItem -Path './LinearAlgebra/src', './MachineLearning/CustomNeuralNetwork/src', './Utils/src', -Filter '*.cpp' -Recurse | ForEach-Object { $_.FullName }) `
   main.cpp -o neural-network.exe -Wall -Wextra
 ```
 
@@ -117,11 +138,6 @@ A neural network framework built from scratch using the LinearAlgebra library.
 
 Currently using **direct clang++ compilation** via PowerShell script (`build.ps1`) for faster compile times.
 
-### Why not CMake?
-- Faster iteration during development
-- Simpler configuration
-- Easier to debug
-
 **Future:** May migrate to CMake for larger projects.
 
 ## 📖 Usage Examples
@@ -152,11 +168,19 @@ Matrix x_train({{0, 0}, {1, 0}, {0, 1}, {1, 1}});
 Matrix y_train({{0}, {1}, {1}, {0}});
 
 // Create and train neural network
-NN network();
-network.initialize();
-network.setActivationFunction(SIGMOID);
+int input_dim = 2;
+int n_layers = 1;
+int layers_dim = 2;
+int output_dim = 1;
+float learning_rate = 1e-2;
+int epochs = 1e6;
+NN network(input_dim, n_layers, layers_dim, output_dim);
+network.setInitializationFunction(RANDOM);
+network.setActivationFunction(ReLU);
 network.setLossFunction(MSE);
-network.fit(x_train, y_train, 1000, 0.1);
+network.setOptimizer(SGD, learning_rate);
+network.initialize();
+network.fit(x_train, y_train, epochs);
 
 // Predict
 float prediction = network.predict({1.0f, 1.0f});
@@ -168,7 +192,7 @@ std::cout << "Prediction: " << prediction << std::endl;
 ### Code Organization
 - **Public headers** in `include/` - user-facing API
 - **Private headers** in `src/` - internal implementation details
-- **Template implementations** in `.hpp` files
+- **Template implementations** in `.h` and `.tpp` files
 
 ### Compilation Strategy
 1. Forward declarations in headers reduce compile time
@@ -194,4 +218,5 @@ MIT License - Feel free to use for learning purposes.
 
 ## 👤 Author
 
-Created by Thiago - July 2024
+Created by Thiago Souza - July 2024
+Last Updated: 2026-01-31

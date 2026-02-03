@@ -14,6 +14,9 @@ add_subdirectory(LinearAlgebra)
 # CustomNeuralNetwork
 add_subdirectory(MachineLearning/CustomNeuralNetwork)
 
+# Utils
+add_subdirectory(Utils)
+
 # Set default build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -27,4 +30,5 @@ target_link_libraries(main PRIVATE LinearAlgebra CustomNeuralNetwork)
 target_include_directories(main PRIVATE 
     ${CMAKE_SOURCE_DIR}/LinearAlgebra/include
     ${CMAKE_SOURCE_DIR}/MachineLearning/CustomNeuralNetwork/include
+    ${CMAKE_SOURCE_DIR}/Utils/include
 )

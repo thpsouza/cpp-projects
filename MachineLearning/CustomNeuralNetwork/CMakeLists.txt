@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fcolor-diagnostics -fansi-escape-
 
 # Set optimization flags
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 endif()
@@ -19,9 +19,14 @@ set(FRAMEWORK_SOURCES
     src/ActivationFunctions/ReLUActivationFunction.cpp
     src/ActivationFunctions/SigmoidActivationFunction.cpp
     src/ActivationFunctions/TanhActivationFunction.cpp
+    src/InitializationFunctions/BaseInitializationFunction.cpp
+    src/InitializationFunctions/HeInitializationFunction.cpp
+    src/InitializationFunctions/RandomInitializationFunction.cpp
+    src/InitializationFunctions/XavierInitializationFunction.cpp
     src/LossFunctions/BaseLossFunction.cpp
     src/LossFunctions/MeanSquaredErrorLossFunction.cpp
-    src/Optimizers/BaseOptimizer.cpp
+    src/Optimizers/AdaptativeMomentOptimizer.cpp
+    src/Optimizers/BaseGDOptimizer.cpp
     src/Optimizers/StochasticGDOptimizer.cpp
 )
 

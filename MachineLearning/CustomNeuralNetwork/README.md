@@ -31,6 +31,7 @@ CustomNeuralNetwork/
 ├── include/
 │   └── CustomNeuralNetwork/
 │       ├── NN.h
+│       ├── DenseLayer.h
 │       ├── ActivationFunctions/
 │       │   ├── ActivationFunctions.h
 │       │   ├── BaseActivationFunction.h
@@ -47,6 +48,7 @@ CustomNeuralNetwork/
 │           └── StochasticGDOptimizer.h
 └── src/
     ├── NN.cpp
+    ├── DenseLayer.cpp
     ├── ActivationFunctions/
     │   ├── BaseActivationFunction.cpp
     │   ├── ReLUActivationFunction.cpp
