@@ -78,7 +78,13 @@ namespace linalg {
     Vector<T> pow(const Vector<T>& m, T n);
     template <typename T>
     Vector<T> pow(const Vector<T>& m, int n);
-    
+
+
+    template <typename T, typename Func>
+    Matrix<T> transform(const Matrix<T> &m, Func func);
+    template <typename T, typename Func>
+    Vector<T> transform(const Vector<T> &v, Func func);
+
     /** @} */ // End of Functions group
 }
 
