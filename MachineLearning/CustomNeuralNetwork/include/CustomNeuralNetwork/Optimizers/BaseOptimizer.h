@@ -1,17 +1,27 @@
 #ifndef NN_MODEL_BASE_OPTIMIZER_H
 #define NN_MODEL_BASE_OPTIMIZER_H
 
+#include <LinearAlgebra/LinAlg.h>
+
 
 class BaseOptimizer {
+protected:
+    float learning_rate;
+    // std::vector<float>* parameters;
+    
 public:
     BaseOptimizer() = default;
+    BaseOptimizer(float lr);
     virtual ~BaseOptimizer() = default;
 
-    // Updates a single weight given its gradient
-    virtual void update(float& weight, float gradient) = 0;
+    // Setters/Getters
+    void setLearningRate(float lr);
+    float getLearningRate() const;
+    // void setParameters(Matrix& weights, Vector& biases);
 
-    // TODO: Later add batch update methods to support matrix operations
-    // virtual void updateBatch(Matrix& weights, const Matrix& gradients);
+    // Updates a single weight given its gradient
+    virtual void update(Matrix& w, Vector& b, float grad, const float* last_input, int signal_size) = 0;
+    // virtual void update(Matrix& weights, const Matrix& gradients) = 0;
 };
 
 

@@ -4,19 +4,12 @@
 #include "BaseOptimizer.h"
 
 
-class SGDOptimizer : public BaseOptimizer {
-private:
-    float learning_rate;
-
+class StochasticGDOptimizer : public BaseOptimizer {
 public:
-    explicit SGDOptimizer(float lr = 0.01f);
-    ~SGDOptimizer() = default;
+    explicit StochasticGDOptimizer(float lr = 1e-3);
+    ~StochasticGDOptimizer() = default;
 
-    void update(float& weight, float gradient) override;
-
-    // Setters/Getters
-    void setLearningRate(float lr);
-    float getLearningRate() const;
+    void update(Matrix& w, Vector& b, float grad, const float* last_input, int signal_size) override;
 };
 
 

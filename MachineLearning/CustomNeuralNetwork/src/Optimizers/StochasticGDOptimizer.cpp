@@ -1,17 +1,12 @@
 #include <CustomNeuralNetwork/Optimizers/StochasticGDOptimizer.h>
 
 
-SGDOptimizer::SGDOptimizer(float lr) : learning_rate(lr) {
+StochasticGDOptimizer::StochasticGDOptimizer(float lr) : BaseOptimizer(lr) {
 }
 
-void SGDOptimizer::update(float& weight, float gradient) {
-    weight -= learning_rate * gradient;
-}
-
-void SGDOptimizer::setLearningRate(float lr) {
-    learning_rate = lr;
-}
-
-float SGDOptimizer::getLearningRate() const {
-    return learning_rate;
+void StochasticGDOptimizer::update(Matrix& w, Vector& b, float grad, const float* last_input, int signal_size) {
+    for (size_t i = 0; i < signal_size; i++) {
+        w[i] -= learning_rate * grad * last_input[i];
+    }
+    b[0] -= learning_rate * grad;
 }
