@@ -104,9 +104,9 @@ void xorNetwork() {
 }
 
 int main(int argc, char const *argv[]) {
-    // andNetwork();
+    andNetwork();
     // nandNetwork();
     // orNetwork();
-    xorNetwork();
+    // xorNetwork();
     return 0;
 }
