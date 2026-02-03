@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/NN.h>
+#include <CustomNeuralNetwork/DenseLayer.h>
 #include <CustomNeuralNetwork/ActivationFunctions/ActivationFunctions.h>
 #include <CustomNeuralNetwork/InitializationFunctions/InitializationFunctions.h>
 #include <CustomNeuralNetwork/LossFunctions/LossFunctions.h>
@@ -12,7 +13,7 @@
 // Constructor/Destructor
 NN::NN(int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim) :
     input_size(input_size),
-    output_dim(output_dim)
+    output_dim(output_dim),
     L(num_hidden_layers),
     HL(hidden_layers_dim),
     activation(std::make_unique<BaseActivationFunction>()) 
@@ -32,12 +33,16 @@ NN::NN(std::string model_name, int input_size, int num_hidden_layers, int hidden
 }
 
 // Getters/Setters
-float NN::getOutput() const {
+const Vector& NN::getOutput() const {
   return y_predict;
 }
 
 const std::vector<float> &NN::getLossHistory() const {
     return loss_history;
+}
+
+std::vector<DenseLayer> &NN::getLayers() {
+    return layers;
 }
 
 void NN::setActivationFunction(std::unique_ptr<BaseActivationFunction> function) {
@@ -60,33 +65,30 @@ void NN::setOptimizer(std::unique_ptr<BaseOptimizer> opt, float learning_rate) {
 
 
 // Network Methods
+void NN::addLayer(DenseLayer& layer) {
+    layers.push_back(std::move(layer));
+}
+
+
 void NN::initialize() {
     if (!initializer) {
         throw std::runtime_error("No initialization function set! Use setInitializationFunction() before calling initialize().");
     }
-    initializer->initialize(w, b);
-    initialized = true;
-}
-
-void NN::forward(const float* x) { // TODO: RIGHT NOW, ITS SPECIFIC TO 1 NEURON
-    float sum = 0;
-    for (size_t i = 0; i < input_size; i++) {
-        sum += w[i] * x[i];
+    for (DenseLayer& layer : layers) {
+        layer.initialize(initializer.get());
     }
-    sum += b.getElement(0, 0);
-    z_cache = sum;
-    y_predict = activation->call(sum);
+}   
+
+void NN::forward(const Vector& x) { // TODO: RIGHT NOW, ITS SPECIFIC TO 1 NEURON
+    y_predict = layers[0].forward(x);
+    y_predict = layers[1].forward(y_predict);
 }
 
-void NN::backward(float y_target) { // TODO: RIGHT NOW, ITS SPECIFIC TO 1 NEURON
+void NN::backward(Vector y_target) {
     // float dL_ds = loss->grad(y_predict, y_target);
     // float ds_dl = activation->grad(z_cache);
     // float grad = dL_ds * ds_dl;
-
-    float dL_ds2 = loss->grad(y_predict, y_target);
-    float ds2_dl2 = activation->grad(z_cache);
-    float grad = 0;
-    optimizer->update(w, b, grad, last_input, input_size);
+    // optimizer->update(w, b, grad, last_input, input_size);
 }
 
 void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int print_count) {
@@ -111,51 +113,58 @@ void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int pr
     }   
 
     float average_loss;
-    std::vector<float> loss_history;
     size_t print_interval = (epochs <= print_count) ? 1 : (epochs / print_count);
     loss_history.reserve(print_count+1);
 
     // Training loop
-    std::cout << "Training:" << "\n";
-    for (size_t e = 0; e < epochs; e++) {
-        float sample_loss = 0;
-        for (size_t i = 0; i < sample_shape.rows; i++) {
-            last_input = x_train.getRow(i);
-            forward(last_input);
-            float y_target = y_train(i, 0);
-            backward(y_target);
-            sample_loss += loss->call(y_predict, y_target);
-        }
-        average_loss = sample_loss / sample_shape.rows;
-        if (e % print_interval == 0 || e == epochs - 1) { 
-            loss_history.push_back(average_loss);
-            std::cout << "Epoch: " << (e + 1) << "/" << epochs 
-                      << " | Loss: " << average_loss << "\n";
-        }
-    }       
+    // std::cout << "Training:" << "\n";
+    // for (size_t e = 0; e < epochs; e++) {
+    //     float sample_loss = 0;
+    //     for (size_t i = 0; i < sample_shape.rows; i++) {
+    //         last_input = x_train.getRow(i);
+    //         forward(last_input);
+    //         float y_target = y_train(i, 0);
+    //         backward(y_target);
+    //         sample_loss += loss->call(y_predict, y_target);
+    //     }
+    //     average_loss = sample_loss / sample_shape.rows;
+    //     if (e % print_interval == 0 || e == epochs - 1) { 
+    //         loss_history.push_back(average_loss);
+    //         std::cout << "Epoch: " << (e + 1) << "/" << epochs 
+    //                   << " | Loss: " << average_loss << "\n";
+    //     }
+    // }       
 }
 
-float NN::predict(const std::initializer_list<float> &x)
+Vector& NN::predict(const std::initializer_list<float>& x)
 {
     // For tests only
     if (x.size() != input_size) {
         throw std::invalid_argument("Input size does not match NN dimension!");
     }
-    forward(x.begin()); 
+    buffer = x;
+    forward(buffer); 
     return y_predict;
 }
 
 
 // Print
 void NN::print() const {
-    Shape s = w.getShape();
-    std::cout << "Current state of the network: \n";
-    for (size_t j=0; j<s.cols; j++) {
-        for (size_t i=0; i<s.rows; i++) {
-            std::cout << "w" << i+1 << j+1 << " = " << w(i,j) << ", ";
+    std::cout << "\n========================================\n";
+    std::cout << std::format("NEURAL NETWORK SUMMARY: {}\n", model_name.empty() ? "Unnamed" : model_name);
+    std::cout << "========================================\n";
+    
+    if (layers.empty()) {
+        std::cout << " [Empty Network]\n";
+    } else {
+        for (auto& layer : layers) {
+            layer.print();
+            std::cout << "\n";
+            // std::cout << "===============================\n";
         }
-        std::cout << "b" << j+1 << " = " << b[j] << "\n";
     }
+    
+    std::cout << "========================================\n";
 }
 
 void NN::save() {

@@ -1,5 +1,5 @@
-#ifndef NN_MODEL_LAYER_H
-#define NN_MODEL_LAYER_H
+#ifndef NN_MODEL_DENSE_LAYER_H
+#define NN_MODEL_DENSE_LAYER_H
 
 // Standard lib includes
 #include <vector>
@@ -10,6 +10,7 @@
 
 // Forward declarations
 class BaseActivationFunction;
+class BaseInitializationFunction;
 
 // Implementation
 class DenseLayer {
@@ -42,12 +43,13 @@ public:
     Vector& getOutput();
 
     // Methods
+    void initialize(BaseInitializationFunction* initializer);
     Vector forward(const Vector& x);
     void backward(float y_target);
-    void print();
+    void print() const;
     void save(std::ostream& output);
     void load(std::istream& input);
 };
 
 
-#endif //NN_MODEL_LAYER_H
+#endif //NN_MODEL_DENSE_LAYER_H

@@ -1,5 +1,6 @@
 #include <CustomNeuralNetwork/DenseLayer.h>
 #include <CustomNeuralNetwork/ActivationFunctions/ActivationFunctions.h>
+#include <CustomNeuralNetwork/InitializationFunctions/InitializationFunctions.h>
 #include <iomanip>
 
 
@@ -67,6 +68,10 @@ Vector &DenseLayer::getOutput() {
 
 
 // Methods
+void DenseLayer::initialize(BaseInitializationFunction* initializer) {
+    initializer->initialize(w, b);
+}
+
 Vector DenseLayer::forward(const Vector& x) {
     last_input = x;
     z_cache = w.dotAdd(x, b);
@@ -78,9 +83,12 @@ void DenseLayer::backward(float y_target) {
     
 }
 
-void DenseLayer::print() {
-    std::cout << std::format("DenseLayer{}:", layer_id) << "\n"; 
-    w.print();
+void DenseLayer::print() const {
+    // std::cout << std::format("DENSELAYER{}:", layer_id) << "\n"; 
+    // w.print();
+    // b.print();
+    std::cout << std::format(" - - - - DENSE LAYER {} ({} -> {}): - - - -\n", layer_id, input_dim, output_dim);
+    w.print(); 
     b.print();
 }
 
@@ -88,7 +96,7 @@ void DenseLayer::save(std::ostream &output) {
     output << "LAYER " << layer_id << " DENSE " 
     << output_dim << " " << input_dim << " "
     << activation->getName();
-    output << "\nWEIGHTS\n";;
+    output << "\nWEIGHTS\n";
     output << std::setprecision(std::numeric_limits<float>::max_digits10);
     for (size_t i = 0; i < w.getShape().rows; i++) {
         for (size_t j = 0; j < w.getShape().cols; j++) {
@@ -102,4 +110,8 @@ void DenseLayer::save(std::ostream &output) {
         output << b[i] << " ";
     }
     output << "\n";
+}
+
+void DenseLayer::load(std::istream &input) {
+    
 }

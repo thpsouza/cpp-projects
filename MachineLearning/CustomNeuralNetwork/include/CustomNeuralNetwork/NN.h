@@ -7,19 +7,21 @@
 
 // Custom lib includes
 #include <LinearAlgebra/LinAlg.h>
-#include <CustomNeuralNetwork/DenseLayer.h>
 
 // Forward declarations
 class BaseActivationFunction;
 class BaseInitializationFunction;
 class BaseLossFunction;
 class BaseOptimizer;
+class DenseLayer;
 
 // Implementation
 class NN {
 private:
     std::string model_name;
     int input_size;
+    int L;
+    int HL;
     int output_dim;
 
     std::vector<DenseLayer> layers;
@@ -31,8 +33,10 @@ private:
     std::unique_ptr<BaseLossFunction> loss;
     std::unique_ptr<BaseOptimizer> optimizer;
 
-    Vector y;
-    const Vector* last_input;
+    Vector buffer;
+    Vector y_predict;
+    Vector z_cache;
+    const float* last_input;
 
 public:
     // Constructor/Destructor
@@ -40,19 +44,21 @@ public:
     NN(std::string model_name, int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim);
 
     // Getters/Setters
-    float getOutput() const;
+    const Vector& getOutput() const;
     const std::vector<float>& getLossHistory() const;
+    std::vector<DenseLayer>& getLayers();
     void setActivationFunction(std::unique_ptr<BaseActivationFunction> function);
     void setInitializationFunction(std::unique_ptr<BaseInitializationFunction> init);
     void setLossFunction(std::unique_ptr<BaseLossFunction> function);
     void setOptimizer(std::unique_ptr<BaseOptimizer> opt, float learning_rate=1e-3);
 
     // Methods
+    void addLayer(DenseLayer& layer);
     void initialize();
-    void forward(const float* x);
-    void backward(float y_target);
+    void forward(const Vector& x);
+    void backward(Vector y_target);
     void fit(const Matrix& x_train, const Matrix& y_train, size_t epochs=100, int print_count=20);
-    float predict(const std::initializer_list<float>& x);
+    Vector& predict(const std::initializer_list<float>& x);
 
     void print() const;
     void save();
