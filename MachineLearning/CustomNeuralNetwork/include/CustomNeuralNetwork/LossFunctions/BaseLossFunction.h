@@ -1,8 +1,10 @@
 #ifndef NN_MODEL_BASE_LOSS_FUNCTION_H
 #define NN_MODEL_BASE_LOSS_FUNCTION_H
 
-#include <LinearAlgebra/LinAlg.h>
+// Forward declarations
+#include <LinearAlgebra/LinAlgFwds.h>
 
+// Implementation
 class BaseLossFunction {
     public:
     BaseLossFunction() = default;

@@ -1,6 +1,7 @@
 #ifndef NN_MODEL_LOSS_FUNCTIONS_H
 #define NN_MODEL_LOSS_FUNCTIONS_H
 
+#include <memory>
 #include "BaseLossFunction.h"
 #include "MeanSquaredErrorLossFunction.h"
 

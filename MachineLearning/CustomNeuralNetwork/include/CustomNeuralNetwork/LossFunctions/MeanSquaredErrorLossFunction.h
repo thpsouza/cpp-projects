@@ -2,7 +2,6 @@
 #define NN_MODEL_MEAN_SQUARED_ERROR_LOSS_H
 
 #include "BaseLossFunction.h"
-#include <LinearAlgebra/LinAlg.h>
 
 class MeanSquaredErrorLossFunction : public BaseLossFunction {
     public:

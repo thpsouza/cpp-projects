@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/LossFunctions/MeanSquaredErrorLossFunction.h>
+#include <LinearAlgebra/LinAlg.h>
 #include <cmath>
 
 
