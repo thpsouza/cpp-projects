@@ -1,8 +1,11 @@
 #ifndef NN_MODEL_BASE_INITIALIZATION_FUN_H
 #define NN_MODEL_BASE_INITIALIZATION_FUN_H
 
-#include <LinearAlgebra/LinAlg.h>
+// Forward declarations
+#include <LinearAlgebra/LinAlgFwds.h>
 
+
+// Implementation
 class BaseInitializationFunction {
 public:
     BaseInitializationFunction() = default;

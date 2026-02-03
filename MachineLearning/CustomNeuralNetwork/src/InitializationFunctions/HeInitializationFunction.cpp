@@ -1,4 +1,5 @@
 #include <CustomNeuralNetwork/InitializationFunctions/HeInitializationFunction.h>
+#include <LinearAlgebra/LinAlg.h>
 #include <cmath>
 #include <random>
 

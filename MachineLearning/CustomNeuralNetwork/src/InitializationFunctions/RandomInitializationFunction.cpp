@@ -1,6 +1,7 @@
 #include <CustomNeuralNetwork/InitializationFunctions/RandomInitializationFunction.h>
+#include <LinearAlgebra/LinAlg.h>
+#include <random>
 #include <stdlib.h>
-#include <time.h>
 
 
 void RandomInitializationFunction::initialize(Matrix& w, Vector& b) const {
