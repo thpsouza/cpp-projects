@@ -7,7 +7,7 @@
 
 // Custom lib includes
 #include <LinearAlgebra/LinAlg.h>
-#include <CustomNeuralNetwork/DenseLayer.h>
+
 
 // Forward declarations
 class BaseActivationFunction;
@@ -22,7 +22,8 @@ private:
     int input_size;
     int output_dim;
 
-    std::vector<DenseLayer> layers;
+    Matrix w; 
+    Vector b;
     std::vector<float> loss_history;
     bool initialized = false;
 
@@ -31,13 +32,14 @@ private:
     std::unique_ptr<BaseLossFunction> loss;
     std::unique_ptr<BaseOptimizer> optimizer;
 
-    Vector y;
-    const Vector* last_input;
+    float y_predict;
+    float z_cache;
+    const float* last_input;
 
 public:
     // Constructor/Destructor
-    NN(int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim);
-    NN(std::string model_name, int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim);
+    NN(int input_size, int output_dim);
+    NN(std::string model_name, int input_size, int output_dim);
 
     // Getters/Setters
     float getOutput() const;
@@ -55,7 +57,6 @@ public:
     float predict(const std::initializer_list<float>& x);
 
     void print() const;
-    void save();
 };
 
 

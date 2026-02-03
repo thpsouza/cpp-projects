@@ -10,23 +10,17 @@
 
 
 // Constructor/Destructor
-NN::NN(int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim) :
+NN::NN(int input_size, int output_dim) :
     input_size(input_size),
-    output_dim(output_dim)
-    L(num_hidden_layers),
-    HL(hidden_layers_dim),
+    output_dim(output_dim),
     activation(std::make_unique<BaseActivationFunction>()) 
 {
-    int i = 0;
-    layers.push_back(DenseLayer(input_size, hidden_layers_dim, SIGMOID, 1));
-    for(; i < num_hidden_layers - 1; ++i) {
-        layers.push_back(DenseLayer(hidden_layers_dim, hidden_layers_dim, SIGMOID, i+2));
-    }
-    layers.push_back(DenseLayer(hidden_layers_dim, output_dim, SIGMOID, i+2));
+    w.resize(input_size, 1);
+    b.setSize(1);
 }
 
-NN::NN(std::string model_name, int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim) : 
-    NN(input_size, num_hidden_layers, hidden_layers_dim, output_dim)
+NN::NN(std::string model_name, int input_size, int output_dim) : 
+    NN(input_size, output_dim)
 {
     this->model_name = model_name;
 }
@@ -55,7 +49,6 @@ void NN::setLossFunction(std::unique_ptr<BaseLossFunction> function) {
 void NN::setOptimizer(std::unique_ptr<BaseOptimizer> opt, float learning_rate) {
     optimizer = std::move(opt);
     optimizer->setLearningRate(learning_rate);
-    // optimizer->setParameters(w, b);
 }
 
 
@@ -79,13 +72,9 @@ void NN::forward(const float* x) { // TODO: RIGHT NOW, ITS SPECIFIC TO 1 NEURON
 }
 
 void NN::backward(float y_target) { // TODO: RIGHT NOW, ITS SPECIFIC TO 1 NEURON
-    // float dL_ds = loss->grad(y_predict, y_target);
-    // float ds_dl = activation->grad(z_cache);
-    // float grad = dL_ds * ds_dl;
-
-    float dL_ds2 = loss->grad(y_predict, y_target);
-    float ds2_dl2 = activation->grad(z_cache);
-    float grad = 0;
+    float dL_ds = loss->grad(y_predict, y_target);
+    float ds_dl = activation->grad(z_cache);
+    float grad = dL_ds * ds_dl;
     optimizer->update(w, b, grad, last_input, input_size);
 }
 
@@ -111,7 +100,6 @@ void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int pr
     }   
 
     float average_loss;
-    std::vector<float> loss_history;
     size_t print_interval = (epochs <= print_count) ? 1 : (epochs / print_count);
     loss_history.reserve(print_count+1);
 
@@ -149,15 +137,11 @@ float NN::predict(const std::initializer_list<float> &x)
 // Print
 void NN::print() const {
     Shape s = w.getShape();
-    std::cout << "Current state of the network: \n";
+    std::cout << this->model_name << " - Current state of the network: \n";
     for (size_t j=0; j<s.cols; j++) {
         for (size_t i=0; i<s.rows; i++) {
             std::cout << "w" << i+1 << j+1 << " = " << w(i,j) << ", ";
         }
         std::cout << "b" << j+1 << " = " << b[j] << "\n";
     }
-}
-
-void NN::save() {
-    // std::string s = std::format("{}_\n", this->model_name, shape.rows, shape.cols);
 }

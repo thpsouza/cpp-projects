@@ -74,7 +74,8 @@ namespace linalg {
     // ========== OPERATORS: ASSIGNMENT ==========
     template <typename T>
     Vector<T>& Vector<T>::operator=(T x) {
-        return Vector<T>(Matrix<T>::operator=(x));
+        this->Matrix<T>::operator=(x);
+        return *this;
     }
     template <typename T>
     Vector<T>& Vector<T>::operator=(std::initializer_list<T> x) {
