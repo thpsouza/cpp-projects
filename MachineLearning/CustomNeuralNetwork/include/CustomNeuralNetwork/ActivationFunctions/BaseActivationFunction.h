@@ -3,10 +3,11 @@
 
 // Standard lib includes
 #include <vector>
-#include <string>
+#include <string>   
 
 // Forward declarations
-class Matrix;
+#include <LinearAlgebra/LinAlgFwds.h>
+
 
 // Implementation
 class BaseActivationFunction {
