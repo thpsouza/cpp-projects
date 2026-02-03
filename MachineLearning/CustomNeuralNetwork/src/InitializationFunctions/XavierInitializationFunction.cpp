@@ -8,12 +8,12 @@ void XavierInitializationFunction::initialize(Matrix& w, Vector& b) const {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    size_t n_inputs = w.getShape().rows;
-    float std_deviation = std::sqrt(1.0f / n_inputs);
+    size_t n = w.getShape().N;
+    float std_deviation = std::sqrt(1.0f / n);
     std::normal_distribution<float> dist(0.0f, std_deviation);
-    for (size_t i = 0; i < n_inputs; i++) {
+    for (size_t i = 0; i < n; i++) {
         w[i] = dist(gen);
     }
     // By default, biases are initialized to zero.
-    b[0] = 0.0f;
+    b = 0.0f;
 }

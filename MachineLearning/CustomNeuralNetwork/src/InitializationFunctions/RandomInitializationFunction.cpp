@@ -9,9 +9,9 @@ void RandomInitializationFunction::initialize(Matrix& w, Vector& b) const {
     static std::mt19937 gen(rd());
 
     std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-    size_t n_inputs = w.getShape().rows;
-    for (size_t i = 0; i < n_inputs; i++) {
+    size_t n = w.getShape().N;
+    for (size_t i = 0; i < n; i++) {
         w[i] = dist(gen);
     }
-    b[0] = dist(gen) * 0.1f; 
+    b = dist(gen) * 0.1f;
 }
