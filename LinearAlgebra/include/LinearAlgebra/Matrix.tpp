@@ -765,11 +765,16 @@ namespace linalg {
     Matrix<T>::operator std::string() const {
         std::string s = std::format("{} ({}x{}):\n", this->class_name, shape.rows, shape.cols);
         for (size_t i=0; i<shape.rows; i++) {
-            s += "[ ";
+            s += " [ ";
             for (size_t j=0; j<shape.cols; j++) {
-                s += std::to_string(getElement(i, j)) + " ";
+                s += std::format("{:>10.6f} ", getElement(i, j));
+                
             }
             s += "]\n";
+        }
+        // Remove last "\n"
+        if (!s.empty()) {
+            s.pop_back();
         }
         return s;
     }
