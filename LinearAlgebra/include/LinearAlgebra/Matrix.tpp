@@ -19,7 +19,7 @@ namespace linalg {
     template <typename T>
     Matrix<T>::Matrix(size_t rows, size_t cols) :
         shape(rows, cols),
-        values(rows*cols, 0)
+        values(rows*cols)
     {
     }
 
@@ -33,7 +33,7 @@ namespace linalg {
     template <typename T>
     Matrix<T>::Matrix(Shape shape) :
         shape(shape),
-        values(shape.N, 0)
+        values(shape.N)
     {
     }
 
@@ -78,7 +78,13 @@ namespace linalg {
         this->values = flattened;
     }
 
+    
     /// Getter/Setter
+    template <typename T>
+    void Matrix<T>::setName(const std::string& name) {
+        class_name = name;
+    }
+
     template <typename T>
     void Matrix<T>::setElement(T newElement, size_t i, size_t j) {
         if (i>=shape.rows || j>=shape.cols) {
@@ -423,10 +429,51 @@ namespace linalg {
     //     }
     //     return result;
     // }
-
+    
     template <typename T>
     Matrix<T> Matrix<T>::dot(const Matrix<T> &B) const {
         return dot(*this, B);
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &W, const Matrix<T> &X, const Matrix<T> &B) {
+        if (W.shape.cols != X.shape.rows) {
+            throw MismatchedShapes(W.shape, X.shape);
+        }
+        if (W.shape.rows != B.shape.rows) {
+            throw MismatchedShapes(W.shape, B.shape);
+        }
+        // Caches
+        const T* W_ptr = W.values.data();
+        const T* X_ptr = X.values.data();
+        const T* B_ptr = B.values.data();
+        size_t W_rows = W.shape.rows;
+        size_t W_cols = W.shape.cols;
+        size_t X_cols = X.shape.cols;
+        Matrix<T> result(W_rows, X_cols);
+        T* result_ptr = result.values.data();
+        // dotAdd logic:
+        for (size_t i=0; i<W_rows; i++) {
+            // Applying biases first
+            T bias_i = B_ptr[i];
+            for (size_t j=0; j<X_cols; j++) {
+                result_ptr[i*X_cols + j] = bias_i;
+            }
+            // Multiplication 
+            for (size_t k=0; k<W_cols; k++) {
+                T W_ik = W_ptr[i*W_cols + k];     
+                // Internal loop with sequential acesses in memory (only j changes)
+                for (size_t j=0; j<X_cols; j++) {
+                    result_ptr[i*X_cols + j] += W_ik * X_ptr[k*X_cols + j];
+                }
+            }
+        }
+        return result;
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &X, const Matrix<T> &B) const {
+        return dotAdd(*this, X, B);
     }
 
     template <typename T>
@@ -716,12 +763,13 @@ namespace linalg {
     // String representation
     template <typename T>
     Matrix<T>::operator std::string() const {
-        std::string s;
+        std::string s = std::format("{} ({}x{}):\n", this->class_name, shape.rows, shape.cols);
         for (size_t i=0; i<shape.rows; i++) {
+            s += "[ ";
             for (size_t j=0; j<shape.cols; j++) {
                 s += std::to_string(getElement(i, j)) + " ";
             }
-            s += "\n";
+            s += "]\n";
         }
         return s;
     }

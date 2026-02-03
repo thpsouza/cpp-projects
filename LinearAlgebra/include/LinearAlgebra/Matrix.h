@@ -41,6 +41,7 @@ namespace linalg {
     protected:
         Shape shape;
         std::vector<T> values;
+        std::string class_name = "Matrix";
 
     private:
         enum OperationType {ADD, SUB, MUL, DIV};
@@ -124,7 +125,8 @@ namespace linalg {
         Matrix(std::initializer_list<std::initializer_list<T>> values);
 
         // ========== ELEMENT ACCESS ==========
-        
+        void setName(const std::string& name);
+
         /**
          * @brief Sets single element at 2D position.
          * @param newElement Value to set
@@ -337,6 +339,8 @@ namespace linalg {
         static Matrix<T> dot(const Matrix<T>& A, const Matrix<T>& B);
         // static Matrix<T> dot2(const Matrix<T>& A, const Matrix<T>& B);
         
+        static Matrix<T> dotAdd(const Matrix<T> &W, const Matrix<T> &X, const Matrix<T> &B);
+
         /**
          * 
          */
@@ -379,6 +383,7 @@ namespace linalg {
          * @throw MismatchedShapes if this.cols != B.rows
          */
         [[nodiscard]] Matrix<T> dot(const Matrix<T>& B) const;
+        [[nodiscard]] Matrix<T> dotAdd(const Matrix<T> &X, const Matrix<T> &B) const;
 
         /**
          * 
@@ -534,7 +539,7 @@ namespace linalg {
          */
         Matrix<T>& operator/=(T x);
 
-        // ========== OPERATORS: COMPARISON ==========
+        // ========== OPERATORS: COMPARISON ========== 
         
         /**
          * @brief Element-wise greater than comparison.
