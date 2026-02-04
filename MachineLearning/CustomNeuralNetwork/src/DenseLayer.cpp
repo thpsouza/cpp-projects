@@ -105,7 +105,7 @@ void DenseLayer::print() const {
 void DenseLayer::save(std::ostream &output) {
     // Layer Summary
     output << std::format("LAYER {} DENSE {} {} {}\n", 
-        layer_id, output_dim, input_dim, activation->getName());
+        layer_id, input_dim, output_dim, activation->getName());
     // Weights
     size_t rows = w.getShape().rows;
     size_t cols = w.getShape().cols;

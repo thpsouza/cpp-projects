@@ -78,23 +78,20 @@ void testLayer() {
 
 
 void testSaveLoad() {
-    int input_dim = 2;
-    int hidden_layers = 1;
+    int input_dim = 5;
+    int hidden_layers = 2;
     int hidden_layers_dim = 2;
     int output_dim = 1;
-    float learning_rate = 1e-2;
-    
     NN model("SaveLoadTest", input_dim, hidden_layers, hidden_layers_dim, output_dim);
-    model.setInitializationFunction(XAVIER);
+    model.setInitializationFunction(RANDOM);
     model.setActivationFunction(SIGMOID);
     model.setLossFunction(MSE);
     model.setOptimizer(SGD);
     model.initialize();
     model.save("SaveLoadTest.txt");
-    
-    NN model2;
-    model2.load("SaveLoadTest.txt");
-    model2.print();
+    model = NN();
+    model.load("SaveLoadTest.txt");
+    model.print();
 }
 
 

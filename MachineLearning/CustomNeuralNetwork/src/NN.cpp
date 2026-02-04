@@ -155,22 +155,6 @@ Vector& NN::predict(const std::initializer_list<float>& x)
 
 // Other methods
 void NN::validateNetwork(const std::string& caller) const {
-    if (!loss) {
-        throw std::runtime_error(
-            std::format("Loss function has not been set yet! Use setLossFunction() before calling {}().", caller)
-        );
-    }
-    if (!optimizer) {
-        throw std::runtime_error(
-            std::format("Optimizer function has not been set yet! Use setOptimizer() before calling {}().", caller)
-        );
-    }
-    if (!initialized) {
-        throw std::runtime_error(
-            std::format("The weights and bias have not been initialized yet! Use initialize() before calling {}().", caller)
-        );
-    }
-    // Checking layers
     if (layers.empty()) {
         throw std::runtime_error(
             std::format("No layers were added. Use addLayer() before calling {}().", caller)
@@ -183,6 +167,21 @@ void NN::validateNetwork(const std::string& caller) const {
                     i, caller)
             );
         }
+    }
+    if (!initialized) {
+        throw std::runtime_error(
+            std::format("The weights and bias have not been initialized yet! Use initialize() before calling {}().", caller)
+        );
+    }
+    if (!loss) {
+        throw std::runtime_error(
+            std::format("Loss function has not been set yet! Use setLossFunction() before calling {}().", caller)
+        );
+    }
+    if (!optimizer) {
+        throw std::runtime_error(
+            std::format("Optimizer function has not been set yet! Use setOptimizer() before calling {}().", caller)
+        );
     }
 }
 
