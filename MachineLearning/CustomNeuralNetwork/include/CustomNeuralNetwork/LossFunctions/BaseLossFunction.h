@@ -1,14 +1,20 @@
 #ifndef NN_MODEL_BASE_LOSS_FUNCTION_H
 #define NN_MODEL_BASE_LOSS_FUNCTION_H
 
+// Std lib includes
+#include <string>
+
 // Forward declarations
 #include <LinearAlgebra/LinAlgFwds.h>
 
+
 // Implementation
 class BaseLossFunction {
-    public:
+public:
     BaseLossFunction() = default;
     virtual ~BaseLossFunction() = default;
+
+    virtual std::string getName() const;
 
     virtual float call(float y_predict, float y_target) const;
     virtual float grad(float y_predict, float y_target) const;

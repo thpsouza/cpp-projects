@@ -10,6 +10,9 @@ AdaptativeMomentOptimizer::AdaptativeMomentOptimizer(float lr, float b1, float b
 {
 }
 
+std::string AdaptativeMomentOptimizer::getName() const {
+    return "ADAM";
+}
 
 // void AdaptativeMomentOptimizer::update(float& weight, float gradient) {
 //     // Increase time step once per weight update cycle 

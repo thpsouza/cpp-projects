@@ -2,6 +2,10 @@
 #include <LinearAlgebra/LinAlg.h>
 
 
+std::string BaseLossFunction::getName() const {
+    return "UNDEFINED";
+}
+
 float BaseLossFunction::call(float y_predict, float y_target) const
 {
     return 0.0f;

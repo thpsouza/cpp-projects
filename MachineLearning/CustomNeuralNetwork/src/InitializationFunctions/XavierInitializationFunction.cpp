@@ -4,6 +4,10 @@
 #include <random>
 
 
+std::string XavierInitializationFunction::getName() const {
+    return "XAVIER";
+}
+
 void XavierInitializationFunction::initialize(Matrix& w, Vector& b) const {
     // Static generator to get a continuous sequence of random numbers in every call to initialize().
     static std::random_device rd;

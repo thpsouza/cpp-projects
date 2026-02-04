@@ -3,6 +3,7 @@
 
 // Standard lib includes
 #include <vector>
+#include <memory>
 #include <iostream>
 
 // Custom lib includes
@@ -11,6 +12,7 @@
 // Forward declarations
 class BaseActivationFunction;
 class BaseInitializationFunction;
+
 
 // Implementation
 class DenseLayer {
@@ -24,9 +26,12 @@ private:
     Matrix w; 
     Vector b;
     Vector y;
+    void auxiliaryActivationGenerator(std::string &buffer);
+
     
 public:
     // Constructor/Destructor
+    DenseLayer() = default;
     DenseLayer(int input_dim, int output_dim, int layer_id);
     DenseLayer(int input_dim, int output_dim, std::unique_ptr<BaseActivationFunction> activation, int layer_id);
     
@@ -35,6 +40,9 @@ public:
     void setWeights(Matrix&& w);
     void setBiases(Vector&& b);
     void setParamenters(Matrix&& w, Vector&& b);
+    const std::unique_ptr<BaseActivationFunction>& getActivationFunction() const;
+    int getInputDim() const;
+    int getOutputDim() const;
     const Matrix& getWeights() const;
     const Vector& getBiases() const;
     const Vector& getOutput() const;
@@ -48,7 +56,7 @@ public:
     void backward(float y_target);
     void print() const;
     void save(std::ostream& output);
-    void load(std::istream& input);
+    void load(std::istream &input);
 };
 
 

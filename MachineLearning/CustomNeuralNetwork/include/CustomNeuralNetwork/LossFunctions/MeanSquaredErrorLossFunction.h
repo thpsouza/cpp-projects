@@ -4,7 +4,8 @@
 #include "BaseLossFunction.h"
 
 class MeanSquaredErrorLossFunction : public BaseLossFunction {
-    public:
+public:
+    std::string getName() const override;
     float call(float y_predict, float y_target) const override;
     float grad(float y_predict, float y_target) const override;
     Vector call(const Vector& y_predict, const Vector& y_target) const override;

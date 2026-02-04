@@ -15,14 +15,15 @@ class BaseLossFunction;
 class BaseOptimizer;
 class DenseLayer;
 
+
 // Implementation
 class NN {
 private:
     std::string model_name;
     int input_size;
-    int L;
-    int HL;
-    int output_dim;
+    int layers_num = 0;
+    // int HL;
+    // int output_dim;
 
     std::vector<DenseLayer> layers;
     std::vector<float> loss_history;
@@ -40,8 +41,11 @@ private:
 
 public:
     // Constructor/Destructor
-    NN(int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim);
-    NN(std::string model_name, int input_size, int num_hidden_layers, int hidden_layers_dim, int output_dim);
+    NN() = default;
+    NN(int input_size);
+    NN(const std::string& model_name, int input_size);
+    NN(int input_size, int hidden_layers_num, int hidden_layers_dim, int output_dim);
+    NN(const std::string& model_name, int input_size, int hidden_layers_num, int hidden_layers_dim, int output_dim);
 
     // Getters/Setters
     const Vector& getOutput() const;
@@ -60,8 +64,14 @@ public:
     void fit(const Matrix& x_train, const Matrix& y_train, size_t epochs=100, int print_count=20);
     Vector& predict(const std::initializer_list<float>& x);
 
+    void validateNetwork(const std::string& caller) const;
     void print() const;
     void save();
+    void save(const std::string& file_name);
+    void auxiliaryInitializerGenerator(std::string &buffer);
+    void auxiliaryLossGenerator(std::string &buffer);
+    void auxiliaryOptimizerGenerator(std::string &buffer, float lr);
+    void load(const std::string &file_name);
 };
 
 

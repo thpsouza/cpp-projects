@@ -4,6 +4,10 @@
 #include <stdlib.h>
 
 
+std::string RandomInitializationFunction::getName() const {
+    return "RANDOM";
+}
+
 void RandomInitializationFunction::initialize(Matrix& w, Vector& b) const {
     // Static generator to get a continuous sequence of random numbers in every call to initialize().
     static std::random_device rd;

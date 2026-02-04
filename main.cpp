@@ -5,8 +5,6 @@
 #include <CustomNeuralNetwork/LossFunctions/LossFunctions.h>
 #include <CustomNeuralNetwork/Optimizers/Optimizers.h>
 #include <utils.h>
-#include <fstream>
-#include <chrono>
 #include <string>
 
 
@@ -58,47 +56,7 @@ void xorNetwork() {
 }
 
 
-void testLinAlg() {
-    Matrix W = {
-        {-1,2,3},
-        {4,-5,6},
-        {7,8,9},
-    };
-    W.print();
-
-    Vector X = {
-        10,11,12
-    };
-    X.print();
-}
-
-
-void saveModel() {
-    // auto now = std::chrono::system_clock::now();
-    // std::string filename = std::format("model_{:%Y%m%d_%H%M%S}.txt", now);
-    // std::ofstream outfile(filename);
-    // if (outfile.is_open()) {
-    //     L1.save(outfile);
-    //     L2.save(outfile);
-    //     outfile.close();
-    //     std::cout << "Model saved to: " << filename << std::endl;
-    // } else {
-    //     std::cerr << "Error: Could not open file for saving!" << std::endl;
-    // }
-}
-
-
-int main(int argc, char const *argv[]) {
-    // xorNetwork();
-
-    int input_dim = 2;
-    int hidden_layers = 1;
-    int hidden_layers_dim = 2;
-    int output_dim = 1;
-    float learning_rate = 1e-2;
-    int epochs = 1e6;
-
-    NN model(input_dim, hidden_layers, hidden_layers_dim, output_dim);
+void testLayer() {
     DenseLayer L1(2,2,1);
     DenseLayer L2(2,1,2);
     L1.setActivationFunction(SIGMOID);
@@ -112,33 +70,57 @@ int main(int argc, char const *argv[]) {
         {9.391535, -10.341160},
     });
     L2.setBiases(Vector{-4.496364});
-    model.setInitializationFunction(RANDOM);
+
+    Vector X = {1,1};
+    L2.forward(L1.forward(X));
+    L2.getOutput().print();
+}
+
+
+void testSaveLoad() {
+    int input_dim = 2;
+    int hidden_layers = 1;
+    int hidden_layers_dim = 2;
+    int output_dim = 1;
+    float learning_rate = 1e-2;
+    
+    NN model("SaveLoadTest", input_dim, hidden_layers, hidden_layers_dim, output_dim);
+    model.setInitializationFunction(XAVIER);
     model.setActivationFunction(SIGMOID);
     model.setLossFunction(MSE);
-    model.setOptimizer(SGD, learning_rate);
-    // model.addLayer(L1);
-    // model.addLayer(L2);
+    model.setOptimizer(SGD);
     model.initialize();
-    auto& layers = model.getLayers();
-    layers[0].print();
-    layers[1].print();
-    model.print();
-    Vector X = {1,1};
+    model.save("SaveLoadTest.txt");
+    
+    NN model2;
+    model2.load("SaveLoadTest.txt");
+    model2.print();
+}
+
+
+int main(int argc, char const *argv[]) {
+    // xorNetwork();
+    // testLayer();
+    testSaveLoad();
+
+    // int input_dim = 2;
+    // int hidden_layers = 1;
+    // int hidden_layers_dim = 2;
+    // int output_dim = 1;
+    // float learning_rate = 1e-2;
+    // int epochs = 1e6;
+
+    // NN model("Test1", input_dim, hidden_layers, hidden_layers_dim, output_dim);
+    // model.setInitializationFunction(RANDOM);
+    // model.setActivationFunction(SIGMOID);
+    // model.setLossFunction(MSE);
+    // model.setOptimizer(SGD, learning_rate);
+    // model.initialize();
+    // model.print();
+    // // model.fit(x_train, y_train, epochs);
+    // Vector X = {1,1};
     // model.forward(X);
     // model.getOutput().print();
-
-    L1.forward(X);
-    L2.forward(L1.getOutput());
-    L2.getOutput().print();
-
-
-    // std::ofstream outfile;
-    // outfile.open("model.txt");//, std::ios_base::app); // Open in append mode
-    // L1.save(outfile);
-    // L2.save(outfile);
-    // outfile.close();
-    // saveModel();
-    // xorNetwork();
 
     return 0;
 }

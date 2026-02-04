@@ -5,6 +5,7 @@
 
 class RandomInitializationFunction : public BaseInitializationFunction {
 public:
+    std::string getName() const override;
     void initialize(Matrix& w, Vector& b) const override;
 };
 

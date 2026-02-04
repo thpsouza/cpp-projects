@@ -3,6 +3,10 @@
 #include <cmath>
 
 
+std::string MeanSquaredErrorLossFunction::getName() const {
+    return "MSE";
+}
+
 float MeanSquaredErrorLossFunction::call(float y_predict, float y_target) const {
     return pow(y_target - y_predict, 2);
 }

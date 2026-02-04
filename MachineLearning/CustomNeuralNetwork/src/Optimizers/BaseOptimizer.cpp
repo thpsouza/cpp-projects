@@ -4,6 +4,10 @@
 BaseOptimizer::BaseOptimizer(float lr) : learning_rate(lr) {
 }
 
+std::string BaseOptimizer::getName() const {
+    return "UNDEFINED";
+}
+
 void BaseOptimizer::setLearningRate(float lr) {
   	learning_rate = lr;
 }

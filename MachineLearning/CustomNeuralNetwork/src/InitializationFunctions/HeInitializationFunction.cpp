@@ -3,6 +3,11 @@
 #include <cmath>
 #include <random>
 
+
+std::string HeInitializationFunction::getName() const {
+    return "HE";
+}
+
 void HeInitializationFunction::initialize(Matrix& w, Vector& b) const {
     // Static generator to get a continuous sequence of random numbers in every call to initialize().
     static std::random_device rd;

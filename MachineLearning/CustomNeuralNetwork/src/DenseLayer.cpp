@@ -47,6 +47,16 @@ void DenseLayer::setParamenters(Matrix&& w, Vector&& b) {
     this->w = std::move(w); 
     this->b = std::move(b);
 }
+
+const std::unique_ptr<BaseActivationFunction>& DenseLayer::getActivationFunction() const {
+    return activation;
+}
+int DenseLayer::getInputDim() const { 
+    return input_dim; 
+}
+int DenseLayer::getOutputDim() const { 
+    return output_dim; 
+}
 const Matrix &DenseLayer::getWeights() const {
     return w;
 }
@@ -93,25 +103,64 @@ void DenseLayer::print() const {
 }
 
 void DenseLayer::save(std::ostream &output) {
-    output << "LAYER " << layer_id << " DENSE " 
-    << output_dim << " " << input_dim << " "
-    << activation->getName();
-    output << "\nWEIGHTS\n";
+    // Layer Summary
+    output << std::format("LAYER {} DENSE {} {} {}\n", 
+        layer_id, output_dim, input_dim, activation->getName());
+    // Weights
+    size_t rows = w.getShape().rows;
+    size_t cols = w.getShape().cols;
+    output << std::format("WEIGHTS {} {}\n", rows, cols);
     output << std::setprecision(std::numeric_limits<float>::max_digits10);
-    for (size_t i = 0; i < w.getShape().rows; i++) {
-        for (size_t j = 0; j < w.getShape().cols; j++) {
-            output << w.getElement(i,j) << " ";
-        output << "\n";
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            output << w.getElement(i,j) << (j == cols - 1 ? "" : " ");
         }
+        output << "\n";
     }
-    output << "\nBIASES\n";
+    // Biases
+    size_t size = b.getSize();
+    output << std::format("BIASES {}\n", size);
     output << std::setprecision(std::numeric_limits<float>::max_digits10);
-    for (size_t i = 0; i < b.getSize(); i++) {
-        output << b[i] << " ";
+    for (size_t i = 0; i < size; i++) {
+        output << b[i] << (i == size - 1 ? "" : " ");
     }
     output << "\n";
 }
 
-void DenseLayer::load(std::istream &input) {
+inline void DenseLayer::auxiliaryActivationGenerator(std::string& buffer) {
+    // Handle activation (MAY BE MOVED TO ITS OWN GENERATOR CLASS)
+    if (buffer == "LINEAR") setActivationFunction(LINEAR);
+    else if (buffer == "SIGMOID") setActivationFunction(SIGMOID);
+    else if (buffer == "TANH") setActivationFunction(TANH);
+    else if (buffer == "RELU") setActivationFunction(RELU);
+}
+
+
+void DenseLayer::load(std::istream &input) {    
+    // Buffer to read the stream
+    std::string buffer;
+    float value;
     
+    // Summary: LAYER {ID} {TYPE} {INPUT_DIM} {OUTPUT_DIM} {ACTIVATION}
+    input >> buffer >> layer_id >> buffer >> input_dim >> output_dim >> buffer;
+    auxiliaryActivationGenerator(buffer);
+
+    // Weights: WEIGHTS {ROWS} {COLS}
+    size_t rows, cols;
+    input >> buffer >> rows >> cols;
+    w.resize(rows, cols);
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
+            input >> value;
+            w.setElement(value, i, j);
+        }
+    }
+    // Biases: BIASES {SIZE}
+    size_t size;
+    input >> buffer >> size;
+    b.setSize(size);
+    for (size_t i = 0; i < size; i++) {
+        input >> value;
+        b.setElement(value, i);   
+    }
 }

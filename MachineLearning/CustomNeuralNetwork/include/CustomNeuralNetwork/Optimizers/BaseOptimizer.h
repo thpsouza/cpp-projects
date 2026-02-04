@@ -1,7 +1,11 @@
 #ifndef NN_MODEL_BASE_OPTIMIZER_H
 #define NN_MODEL_BASE_OPTIMIZER_H
 
-#include <LinearAlgebra/LinAlg.h>
+// Std lib includes
+#include <string>
+
+// Forward Declarations
+#include <LinearAlgebra/LinAlgFwds.h>
 
 
 class BaseOptimizer {
@@ -15,6 +19,7 @@ public:
     virtual ~BaseOptimizer() = default;
 
     // Setters/Getters
+    virtual std::string getName() const;
     void setLearningRate(float lr);
     float getLearningRate() const;
     // void setParameters(Matrix& weights, Vector& biases);

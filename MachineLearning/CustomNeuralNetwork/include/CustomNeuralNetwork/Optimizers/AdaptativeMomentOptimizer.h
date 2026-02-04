@@ -16,6 +16,7 @@ private:
 
 public:
     AdaptativeMomentOptimizer(float lr = 0.001f, float b1 = 0.9f, float b2 = 0.999f, float eps = 1e-8f);
+    std::string getName() const override;
     // void update(float& weight, float gradient) override;
 };
 
