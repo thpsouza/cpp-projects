@@ -398,10 +398,11 @@ namespace linalg {
         size_t B_cols = B.shape.cols;
         Matrix<T> result(A_rows, B_cols);
         T* result_ptr = result.values.data();
+        T A_ik;
         // Looping first through A matrix
         for (size_t i=0; i<A_rows; i++) {
             for (size_t k=0; k<A_cols; k++) {
-                T A_ik = A_ptr[i*A_cols + k];     
+                A_ik = A_ptr[i*A_cols + k];     
                 // Internal loop with sequential acesses in memory (only j changes)
                 for (size_t j=0; j<B_cols; j++) {
                     result_ptr[i*B_cols + j] += A_ik * B_ptr[k*B_cols + j];
@@ -452,6 +453,7 @@ namespace linalg {
         size_t X_cols = X.shape.cols;
         Matrix<T> result(W_rows, X_cols);
         T* result_ptr = result.values.data();
+        T W_ik;
         // dotAdd logic:
         for (size_t i=0; i<W_rows; i++) {
             // Applying biases first
@@ -461,7 +463,7 @@ namespace linalg {
             }
             // Multiplication 
             for (size_t k=0; k<W_cols; k++) {
-                T W_ik = W_ptr[i*W_cols + k];     
+                W_ik = W_ptr[i*W_cols + k];     
                 // Internal loop with sequential acesses in memory (only j changes)
                 for (size_t j=0; j<X_cols; j++) {
                     result_ptr[i*X_cols + j] += W_ik * X_ptr[k*X_cols + j];
@@ -474,6 +476,38 @@ namespace linalg {
     template <typename T>
     Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &X, const Matrix<T> &B) const {
         return dotAdd(*this, X, B);
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &W, const Matrix<T> &X) {
+        if (W.shape.rows != X.shape.rows) {
+            throw MismatchedShapes(W.shape, X.shape);
+        }
+        // Caches
+        const T* W_ptr = W.values.data();
+        const T* X_ptr = X.values.data();
+        size_t W_rows = W.shape.rows;
+        size_t W_cols = W.shape.cols;
+        size_t X_cols = X.shape.cols;
+        Matrix<T> result(W_cols, X_cols);
+        T* result_ptr = result.values.data();
+        T W_ki;
+        // dotTransposed logic:
+        for (size_t i=0; i<W_cols; i++) {
+            for (size_t k=0; k<W_rows; k++) {
+                W_ki = W_ptr[k*W_cols + i];     
+                // Internal loop with sequential acesses in memory (only j changes)
+                for (size_t j=0; j<X_cols; j++) {
+                    result_ptr[i*X_cols + j] += W_ki * X_ptr[k*X_cols + j];
+                }
+            }
+        }
+        return result;
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &X) const {
+        return dotTransposed(*this, X);
     }
 
     template <typename T>
