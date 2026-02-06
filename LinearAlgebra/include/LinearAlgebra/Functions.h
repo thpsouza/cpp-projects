@@ -79,11 +79,24 @@ namespace linalg {
     template <typename T>
     Vector<T> pow(const Vector<T>& m, int n);
 
-
+    
+    // Unary
     template <typename T, typename Func>
     Matrix<T> transform(const Matrix<T> &m, Func func);
     template <typename T, typename Func>
     Vector<T> transform(const Vector<T> &v, Func func);
+
+    // Binary
+    template <typename T, typename Func>
+    Matrix<T> transform(const Matrix<T> &m1, const Matrix<T> &m2, Func func);
+    template <typename T, typename Func>
+    Vector<T> transform(const Vector<T> &v1, const Vector<T> &v2, Func func);
+
+    // Ternary and above (ATTENTION: DOES NOT VERIFY SHAPE/SIZE)
+    template <typename T, typename Func, typename... Matrices>
+    Matrix<T> transform(Func func, const Matrix<T>& first, const Matrices&... rest);
+    template <typename T, typename Func, typename... Vectors>
+    Vector<T> transform(Func func, const Vector<T>& first, const Vectors&... rest);
 
     /** @} */ // End of Functions group
 }

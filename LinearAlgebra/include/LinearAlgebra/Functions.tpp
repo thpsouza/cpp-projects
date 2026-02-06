@@ -5,6 +5,7 @@
 #include "Functions.h"
 #include "Matrix.h"
 #include "Vector.h"
+#include "Shape.h"
 #include <cmath>
 //#include <functional>
 //std::vector<double> transform(std::vector<double> x, std::function<double(double)> f) {
@@ -62,6 +63,7 @@ namespace linalg {
     }
 
 
+    // Unary transform
     template <typename T, typename Func>
     Matrix<T> transform(const Matrix<T>& m, Func func) {
         Matrix<T> result(m.getShape());
@@ -83,5 +85,73 @@ namespace linalg {
         }
         return result;
     }
+
+    // Binary transform
+    template <typename T, typename Func>
+    Matrix<T> transform(const Matrix<T>& m1, const Matrix<T>& m2, Func func) {
+        Shape S1 = m1.getShape();
+        Shape S2 = m2.getShape();
+        if (S1 != S2) throw linalg::MismatchedShapes(S1, S2);
+
+        Matrix<T> result(S1);
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values1 = m1.getElements();
+        const std::vector<T>& values2 = m2.getElements();
+        for (size_t i = 0; i < S1.N; i++) {
+            temp[i] = func(values1[i], values2[i]);
+        }
+        return result;
+    }
+
+    template <typename T, typename Func>
+    Vector<T> transform(const Vector<T>& v1, const Vector<T>& v2, Func func) {
+        size_t N1 = v1.getSize();
+        size_t N2 = v2.getSize();
+        if (N1 != N2) throw linalg::MismatchedNumberOfElements(N1,N2);
+        
+        Vector<T> result(N1);
+        std::vector<T>& temp = result.getElements();
+        const std::vector<T>& values1 = v1.getElements();
+        const std::vector<T>& values2 = v2.getElements();
+        for (size_t i = 0; i < N1; i++) {
+            temp[i] = func(values1[i], values2[i]);
+        }
+        return result;
+    }
+
+	// Ternary and above (ATTENTION: DOES NOT VERIFY SHAPE/SIZE)
+    template <typename T, typename Func, typename... Matrices>
+    Matrix<T> transform(Func func, const Matrix<T>& first, const Matrices& ...rest) {
+		Shape S = first.getShape();
+		if (!((rest.getShape() == S) && ...)) {
+        	throw std::invalid_argument("Mismatched Shapes of matrices passed.");
+    	}
+		
+		Matrix<T> result(S);
+		const T* first_ptr = &first[0];
+		const T* rest_ptr[] = { (&rest[0])... };
+		T* temp_ptr = &result.getElements();
+		for (size_t i = 0; i < S.N; ++i) {
+			temp_ptr[i] = func(first[i], rest[i]...);
+		}
+		return result;
+    }
     
-}
+	template <typename T, typename Func, typename... Vectors>
+    Vector<T> transform(Func func, const Vector<T>& first, const Vectors& ...rest) {
+		size_t N = first.getSize();
+		if (!((rest.getSize() == N) && ...)) {
+        	throw std::invalid_argument("Mismatched number of elements in vectors passed.");
+    	}
+		
+		Vector<T> result(N);
+		const T* first_ptr = &first[0];
+		const T* rest_ptr[] = { (&rest[0])... };
+		T* temp_ptr = &result.getElements();
+		for (size_t i = 0; i < N; ++i) {
+			temp_ptr[i] = func(first[i], rest[i]...);
+		}
+		return result;
+    }
+
+} // namespace linalg
