@@ -354,11 +354,6 @@ namespace linalg {
     }
 
     template <typename T>
-    Matrix<T> Matrix<T>::sum(const Matrix<T> &B, bool subtract) const {
-        return sum(*this, B, subtract);
-    }
-
-    template <typename T>
     T Matrix<T>::accumulate() const {
         T S = 0;
         for (size_t i=0; i<this->shape.N; i++) {
@@ -380,10 +375,6 @@ namespace linalg {
         return Matrix<T>::BaseMatricesOp(A, B, MUL);
     }
 
-    template <typename T>
-    Matrix<T> Matrix<T>::multiply(const Matrix<T> &B, bool divide) const {
-        return multiply(*this, B, divide);
-    }
 
     template <typename T>
     Matrix<T> Matrix<T>::dot(const Matrix<T> &A, const Matrix<T> &B) {
@@ -398,11 +389,10 @@ namespace linalg {
         size_t B_cols = B.shape.cols;
         Matrix<T> result(A_rows, B_cols);
         T* result_ptr = result.values.data();
-        T A_ik;
         // Looping first through A matrix
         for (size_t i=0; i<A_rows; i++) {
             for (size_t k=0; k<A_cols; k++) {
-                A_ik = A_ptr[i*A_cols + k];     
+                const T A_ik = A_ptr[i*A_cols + k];     
                 // Internal loop with sequential acesses in memory (only j changes)
                 for (size_t j=0; j<B_cols; j++) {
                     result_ptr[i*B_cols + j] += A_ik * B_ptr[k*B_cols + j];
@@ -430,11 +420,6 @@ namespace linalg {
     //     }
     //     return result;
     // }
-    
-    template <typename T>
-    Matrix<T> Matrix<T>::dot(const Matrix<T> &B) const {
-        return dot(*this, B);
-    }
 
     template <typename T>
     Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &W, const Matrix<T> &X, const Matrix<T> &B) {
@@ -453,19 +438,18 @@ namespace linalg {
         size_t X_cols = X.shape.cols;
         Matrix<T> result(W_rows, X_cols);
         T* result_ptr = result.values.data();
-        T W_ik;
         // dotAdd logic:
-        for (size_t i=0; i<W_rows; i++) {
+        for (size_t i = 0; i < W_rows; i++) {
             // Applying biases first
             T bias_i = B_ptr[i];
-            for (size_t j=0; j<X_cols; j++) {
+            for (size_t j = 0; j < X_cols; j++) {
                 result_ptr[i*X_cols + j] = bias_i;
             }
             // Multiplication 
-            for (size_t k=0; k<W_cols; k++) {
-                W_ik = W_ptr[i*W_cols + k];     
+            for (size_t k = 0; k < W_cols; k++) {
+                const T W_ik = W_ptr[i*W_cols + k];     
                 // Internal loop with sequential acesses in memory (only j changes)
-                for (size_t j=0; j<X_cols; j++) {
+                for (size_t j = 0; j < X_cols; j++) {
                     result_ptr[i*X_cols + j] += W_ik * X_ptr[k*X_cols + j];
                 }
             }
@@ -474,12 +458,7 @@ namespace linalg {
     }
 
     template <typename T>
-    Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &X, const Matrix<T> &B) const {
-        return dotAdd(*this, X, B);
-    }
-
-    template <typename T>
-    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &W, const Matrix<T> &X) {
+    Matrix<T> Matrix<T>::transposedDot(const Matrix<T> &W, const Matrix<T> &X) {
         if (W.shape.rows != X.shape.rows) {
             throw MismatchedShapes(W.shape, X.shape);
         }
@@ -491,13 +470,12 @@ namespace linalg {
         size_t X_cols = X.shape.cols;
         Matrix<T> result(W_cols, X_cols);
         T* result_ptr = result.values.data();
-        T W_ki;
-        // dotTransposed logic:
-        for (size_t i=0; i<W_cols; i++) {
-            for (size_t k=0; k<W_rows; k++) {
-                W_ki = W_ptr[k*W_cols + i];     
+        // transposedDot logic:
+        for (size_t i = 0; i < W_cols ; i++) {
+            for (size_t k = 0; k < W_rows; k++) {
+                const T W_ki = W_ptr[k*W_cols + i];     
                 // Internal loop with sequential acesses in memory (only j changes)
-                for (size_t j=0; j<X_cols; j++) {
+                for (size_t j = 0; j < X_cols; j++) {
                     result_ptr[i*X_cols + j] += W_ki * X_ptr[k*X_cols + j];
                 }
             }
@@ -506,15 +484,37 @@ namespace linalg {
     }
 
     template <typename T>
-    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &X) const {
-        return dotTransposed(*this, X);
+    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &W, const Matrix<T> &X) {
+        if (W.shape.cols != X.shape.cols) {
+            throw MismatchedShapes(W.shape, X.shape);
+        }
+        // Caches
+        const T* W_ptr = W.values.data();
+        const T* X_ptr = X.values.data();
+        size_t W_rows = W.shape.rows;
+        size_t W_cols = W.shape.cols;
+        size_t X_rows = X.shape.rows;
+        Matrix<T> result(W_rows, X_rows);
+        T* result_ptr = result.values.data();
+        // dotTransposed logic:
+        for (size_t i = 0; i < W_rows; i++) {
+            for (size_t j = 0; j < X_rows; j++) {
+                // Internal loop with sequential acesses in memory (only k changes) and a single acess to 'result_ptr'.
+                T aux = 0;
+                for (size_t k = 0; k < W_cols; k++) {
+                    aux += W_ptr[i*W_cols + k] * X_ptr[j*W_cols + k];
+                }
+                result_ptr[i*X_rows + j] = aux;
+            }
+        }
+        return result;
     }
 
     template <typename T>
     inline void transposeBlock(T* A, T* B, size_t rows, size_t cols, size_t block_size) {
         // #pragma omp parallel for collapse(2)
-        for (size_t i=0; i<rows; i+=block_size) {
-            for (size_t j=0; j<cols; j+=block_size) {
+        for (size_t i = 0; i < rows; i+=block_size) {
+            for (size_t j=0; j < cols; j+=block_size) {
                 size_t i_end = std::min(i + block_size, rows);
                 size_t j_end = std::min(j + block_size, cols);
                 for (size_t bi = i; bi < i_end; bi++) {
@@ -556,6 +556,36 @@ namespace linalg {
     //     values = std::move(transposed_values);
     //     std::swap(shape.rows, shape.cols);
     // }
+    
+    template <typename T>
+    Matrix<T> Matrix<T>::sum(const Matrix<T> &B, bool subtract) const {
+        return sum(*this, B, subtract);
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::multiply(const Matrix<T> &B, bool divide) const {
+        return multiply(*this, B, divide);
+    }
+    
+    template <typename T>
+    Matrix<T> Matrix<T>::dot(const Matrix<T> &B) const {
+        return dot(*this, B);
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::dotAdd(const Matrix<T> &X, const Matrix<T> &B) const {
+        return dotAdd(*this, X, B);
+    }
+
+    template <typename T>
+    Matrix<T> Matrix<T>::transposedDot(const Matrix<T> &X) const {
+        return transposedDot(*this, X);
+    }
+    
+    template <typename T>
+    Matrix<T> Matrix<T>::dotTransposed(const Matrix<T> &X) const {
+        return dotTransposed(*this, X);
+    }
     
     template <typename T>
     void Matrix<T>::transpose(Matrix<T> &A) {
@@ -798,9 +828,9 @@ namespace linalg {
     template <typename T>
     Matrix<T>::operator std::string() const {
         std::string s = std::format("{} ({}x{}):\n", this->class_name, shape.rows, shape.cols);
-        for (size_t i=0; i<shape.rows; i++) {
+        for (size_t i = 0; i<shape.rows; i++) {
             s += " [ ";
-            for (size_t j=0; j<shape.cols; j++) {
+            for (size_t j = 0; j<shape.cols; j++) {
                 s += std::format("{:>10.6f} ", getElement(i, j));
                 
             }

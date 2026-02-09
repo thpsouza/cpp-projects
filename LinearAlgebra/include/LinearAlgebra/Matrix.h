@@ -338,7 +338,7 @@ namespace linalg {
          */
         static Matrix<T> dot(const Matrix<T>& A, const Matrix<T>& B);
         // static Matrix<T> dot2(const Matrix<T>& A, const Matrix<T>& B);
-        
+        static Matrix<T> transposedDot(const Matrix<T> &W, const Matrix<T> &X);
         static Matrix<T> dotTransposed(const Matrix<T> &W, const Matrix<T> &X);
         static Matrix<T> dotAdd(const Matrix<T> &W, const Matrix<T> &X, const Matrix<T> &B);
 
@@ -384,8 +384,9 @@ namespace linalg {
          * @throw MismatchedShapes if this.cols != B.rows
          */
         [[nodiscard]] Matrix<T> dot(const Matrix<T>& B) const;
-        [[nodiscard]] Matrix<T> dotTransposed(const Matrix<T> &X) const;
         [[nodiscard]] Matrix<T> dotAdd(const Matrix<T> &X, const Matrix<T> &B) const;
+        [[nodiscard]] Matrix<T> transposedDot(const Matrix<T> &X) const;
+        [[nodiscard]] Matrix<T> dotTransposed(const Matrix<T> &X) const;
 
         /**
          * 
