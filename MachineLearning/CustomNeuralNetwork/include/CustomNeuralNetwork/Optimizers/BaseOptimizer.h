@@ -25,8 +25,8 @@ public:
     // void setParameters(Matrix& weights, Vector& biases);
 
     // Updates a single weight given its gradient
-    virtual void update(Matrix& w, Vector& b, float grad, const float* last_input, int signal_size) = 0;
-    // virtual void update(Matrix& weights, const Matrix& gradients) = 0;
+    virtual void update(Matrix& w, Vector& b, float grad, const float* input, int signal_size) = 0;
+    virtual void update(Matrix& weights, Vector& b, const Vector& delta, const Vector& input) = 0;
 };
 
 

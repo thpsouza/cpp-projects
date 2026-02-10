@@ -9,7 +9,8 @@ public:
     explicit StochasticGDOptimizer(float lr = 1e-3);
     ~StochasticGDOptimizer() = default;
     std::string getName() const override;
-    void update(Matrix& w, Vector& b, float grad, const float* last_input, int signal_size) override;
+    void update(Matrix& w, Vector& b, float grad, const float* input, int signal_size) override;
+    void update(Matrix& w, Vector& b, const Vector& delta, const Vector& input) override;
 };
 
 
