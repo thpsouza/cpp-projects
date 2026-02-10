@@ -1,17 +1,17 @@
 #include <CustomNeuralNetwork/DenseLayer.h>
 #include <CustomNeuralNetwork/ActivationFunctions/ActivationFunctions.h>
 #include <CustomNeuralNetwork/InitializationFunctions/InitializationFunctions.h>
+#include <CustomNeuralNetwork/Optimizers/Optimizers.h>
 #include <iomanip>
 
 
 // Constructors
 DenseLayer::DenseLayer(int input_dim, int output_dim, int layer_id) :
+    layer_id(layer_id),
     input_dim(input_dim), 
     output_dim(output_dim),
     w(output_dim, input_dim),
-    b(output_dim),
-    z_cache(output_dim),
-    layer_id(layer_id)
+    b(output_dim)
 {
     w.setName(std::format("DenseLayer{}_weights", this->layer_id));
     b.setName(std::format("DenseLayer{}_biases", this->layer_id));
@@ -19,18 +19,17 @@ DenseLayer::DenseLayer(int input_dim, int output_dim, int layer_id) :
 }
     
 DenseLayer::DenseLayer(int input_dim, int output_dim, std::unique_ptr<BaseActivationFunction> activation, int layer_id) : 
+    layer_id(layer_id),
     input_dim(input_dim), 
     output_dim(output_dim),
     activation(std::move(activation)),
     w(output_dim, input_dim),
-    b(output_dim),
-    z_cache(output_dim),
-    layer_id(layer_id)
+    b(output_dim)
 {
     w.setName(std::format("DenseLayer{}_weights", this->layer_id));
     b.setName(std::format("DenseLayer{}_biases", this->layer_id));
     y.setName(std::format("DenseLayer{}_output", this->layer_id));
-    // z_cache.setName(std::format("DenseLayer{}_cache", this->layer_id));
+    // z.setName(std::format("DenseLayer{}_cache", this->layer_id));
 }
 
 // Getters/Setters
@@ -47,7 +46,6 @@ void DenseLayer::setParamenters(Matrix&& w, Vector&& b) {
     this->w = std::move(w); 
     this->b = std::move(b);
 }
-
 const std::unique_ptr<BaseActivationFunction>& DenseLayer::getActivationFunction() const {
     return activation;
 }
@@ -57,14 +55,26 @@ int DenseLayer::getInputDim() const {
 int DenseLayer::getOutputDim() const { 
     return output_dim; 
 }
+const Vector &DenseLayer::getInput() const {
+    return x;
+}
 const Matrix &DenseLayer::getWeights() const {
     return w;
 }
 const Vector &DenseLayer::getBiases() const {
     return b;
 }
+const Vector &DenseLayer::getCache() const {
+    return z;
+}
 const Vector &DenseLayer::getOutput() const {
     return y;
+}
+const Vector &DenseLayer::getDelta() const {
+    return delta;
+}
+Vector &DenseLayer::getInput() {
+    return x;
 }
 Matrix &DenseLayer::getWeights() {
     return w;
@@ -72,31 +82,41 @@ Matrix &DenseLayer::getWeights() {
 Vector &DenseLayer::getBiases() {
     return b;
 }
+Vector &DenseLayer::getCache() {
+    return z;
+}
 Vector &DenseLayer::getOutput() {
     return y;
 }
-
+Vector &DenseLayer::getDelta() {
+    return delta;
+}
 
 // Methods
+void DenseLayer::preAllocate() {
+    x.setSize(input_dim);
+    z.setSize(output_dim);
+    y.setSize(output_dim);
+    delta.setSize(output_dim);
+}
+
 void DenseLayer::initialize(BaseInitializationFunction* initializer) {
     initializer->initialize(w, b);
 }
 
 Vector DenseLayer::forward(const Vector& x) {
-    last_input = x;
-    z_cache = w.dotAdd(x, b);
-    y = activation->call(z_cache);
+    this->x = x;
+    z = w.dotAdd(x, b);
+    y = activation->call(z);
     return y;
 }
 
-void DenseLayer::backward(float y_target) {
-    
+Vector DenseLayer::backward(const Vector& last_grad) {
+    delta = last_grad * activation->grad(z);
+    return w.transposedDot(delta);
 }
 
 void DenseLayer::print() const {
-    // std::cout << std::format("DENSELAYER{}:", layer_id) << "\n"; 
-    // w.print();
-    // b.print();
     std::cout << std::format(" - - - - DENSE LAYER {} ({} -> {}): - - - -\n", layer_id, input_dim, output_dim);
     w.print(); 
     b.print();
@@ -135,7 +155,6 @@ inline void DenseLayer::auxiliaryActivationGenerator(std::string& buffer) {
     else if (buffer == "RELU") setActivationFunction(RELU);
 }
 
-
 void DenseLayer::load(std::istream &input) {    
     // Buffer to read the stream
     std::string buffer;
@@ -163,4 +182,6 @@ void DenseLayer::load(std::istream &input) {
         input >> value;
         b.setElement(value, i);   
     }
+
+    preAllocate();
 }

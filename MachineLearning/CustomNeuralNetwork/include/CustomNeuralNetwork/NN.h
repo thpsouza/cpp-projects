@@ -21,9 +21,9 @@ class NN {
 private:
     std::string model_name;
     int input_size;
+    int output_size;
     int layers_num = 0;
     // int HL;
-    // int output_dim;
 
     std::vector<DenseLayer> layers;
     std::vector<float> loss_history;
@@ -34,18 +34,19 @@ private:
     std::unique_ptr<BaseLossFunction> loss;
     std::unique_ptr<BaseOptimizer> optimizer;
 
-    Vector buffer;
     Vector y_predict;
-    Vector z_cache;
-    const float* last_input;
+    Vector input_buffer;
+    Vector target_buffer;
+    const float* input_ptr;
+    const float* target_ptr;
 
 public:
     // Constructor/Destructor
     NN() = default;
-    NN(int input_size);
-    NN(const std::string& model_name, int input_size);
-    NN(int input_size, int hidden_layers_num, int hidden_layers_dim, int output_dim);
-    NN(const std::string& model_name, int input_size, int hidden_layers_num, int hidden_layers_dim, int output_dim);
+    NN(int input_size, int output_size);
+    NN(const std::string& model_name, int input_size, int output_size);
+    NN(int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size);
+    NN(const std::string& model_name, int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size);
 
     // Getters/Setters
     const Vector& getOutput() const;
@@ -59,9 +60,12 @@ public:
     // Methods
     void addLayer(DenseLayer& layer);
     void initialize();
+    void forward(const float* input);
     void forward(const Vector& x);
-    void backward(Vector y_target);
+    void backward(const float* target);
+    void backward(const Vector& y_target);
     void fit(const Matrix& x_train, const Matrix& y_train, size_t epochs=100, int print_count=20);
+    Vector& predict(Vector& x);
     Vector& predict(const std::initializer_list<float>& x);
 
     void validateNetwork(const std::string& caller) const;
@@ -71,6 +75,7 @@ public:
     void auxiliaryInitializerGenerator(std::string &buffer);
     void auxiliaryLossGenerator(std::string &buffer);
     void auxiliaryOptimizerGenerator(std::string &buffer, float lr);
+    void auxiliaryPreAllocatorFunction();
     void load(const std::string &file_name);
 };
 

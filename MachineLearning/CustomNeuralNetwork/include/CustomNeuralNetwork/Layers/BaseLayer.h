@@ -19,8 +19,8 @@
 //     int input_dim;
 //     int output_dim;
 //     std::unique_ptr<BaseActivationFunction> activation;    
-//     Vector z_cache;
-//     Vector last_input;
+//     Vector z;
+//     Vector input;
 //     Matrix w; 
 //     Vector b;
 //     Vector y;

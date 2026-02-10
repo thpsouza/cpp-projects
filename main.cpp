@@ -7,52 +7,26 @@
 #include <utils.h>
 #include <string>
 
-
-void xorNetwork() {
-    Matrix x_train({
-        {0, 0},
-        {1, 0},
-        {0, 1},
-        {1, 1}
+void testLinearAlgebra() {
+    Matrix W1 ({ // 4x3
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9},
+        {10, 11, 12}
     });
-    Matrix y_train({
-        {0}, 
-        {1}, 
-        {1}, 
-        {0} 
+    Matrix W2 ({ // 3x4
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12}
     });
+    Matrix W3 ({ // 5x1
+        {13}, {14}, {15}, {16}, {17}
+    });
+    Vector X ({18, 19, 20}); // 3x1
 
-    int input_dim = 2;
-    int hidden_layers = 1;
-    int hidden_layers_dim = 2;
-    int output_dim = 1;
-    float learning_rate = 1e-2;
-    int epochs = 1e6;
-
-    NN model(input_dim, hidden_layers, hidden_layers_dim, output_dim);
-    model.setInitializationFunction(RANDOM);
-    model.setActivationFunction(SIGMOID);
-    model.setLossFunction(MSE);
-    model.setOptimizer(SGD, learning_rate);
-    model.initialize();
-
-    model.print();
-    print("\n");
-    // model.fit(x_train, y_train, epochs);
-    print("\n");
-    model.print();
-    print("\n");
-
-    Vector y[4];
-    y[0] = model.predict({0,0});
-    y[1] = model.predict({0,1});
-    y[2] = model.predict({1,0});
-    y[3] = model.predict({1,1});
-    // print("Predict:\n");
-    // print("F(0,0): ", y[0], "\n");
-    // print("F(0,1): ", y[1], "\n");
-    // print("F(1,0): ", y[2], "\n");
-    // print("F(1,1): ", y[3], "\n");
+    W1.dot(X).print(); // 4x1
+    W2.transposedDot(X).print(); // 4x1
+    W3.dotTransposed(X).print(); // 5x3
 }
 
 
@@ -95,29 +69,80 @@ void testSaveLoad() {
 }
 
 
-int main(int argc, char const *argv[]) {
-    // xorNetwork();
-    // testLayer();
-    testSaveLoad();
+void testForwardBackward() {
+    Vector X ({0,0});
+    Vector Y ({0});
 
-    // int input_dim = 2;
-    // int hidden_layers = 1;
-    // int hidden_layers_dim = 2;
-    // int output_dim = 1;
-    // float learning_rate = 1e-2;
-    // int epochs = 1e6;
+    NN model("Test", 2, 1, 1, 1);
+    model.setInitializationFunction(RANDOM);
+    model.setActivationFunction(SIGMOID);
+    model.setLossFunction(MSE);
+    model.setOptimizer(SGD, 1e-3);
+    model.initialize();
+    
+    model.forward(X.getRow(0));
+    model.getOutput().print();
+    
+    model.forward(Vector{0,0});
+    model.getOutput().print();
+    
+    model.backward(Y.getRow(0));
+    model.backward(Vector{0});
+}
 
-    // NN model("Test1", input_dim, hidden_layers, hidden_layers_dim, output_dim);
+
+void xorNetwork() {
+    Matrix x_train({
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1}
+    });
+    Matrix y_train({
+        {0}, 
+        {1}, 
+        {1}, 
+        {0} 
+    });
+
+    int input_dim = 2;
+    int hidden_layers = 1;
+    int hidden_layers_dim = 2;
+    int output_dim = 1;
+    float learning_rate = 1e-1;
+    int epochs = 1e6;
+
+    NN model("Xor", input_dim, hidden_layers, hidden_layers_dim, output_dim);
     // model.setInitializationFunction(RANDOM);
     // model.setActivationFunction(SIGMOID);
     // model.setLossFunction(MSE);
     // model.setOptimizer(SGD, learning_rate);
     // model.initialize();
-    // model.print();
-    // // model.fit(x_train, y_train, epochs);
-    // Vector X = {1,1};
-    // model.forward(X);
-    // model.getOutput().print();
+    // model.print(); print("\n");
+    // model.fit(x_train, y_train, epochs);
+    // model.save("XorModel.txt");
+    model = NN();
+    model.load("XorModel.txt");
+    model.print();
+    
+    Vector y[4];
+    y[0] = model.predict({0,0});
+    y[1] = model.predict({0,1});
+    y[2] = model.predict({1,0});
+    y[3] = model.predict({1,1});
+    print("Predict:\n");
+    print("F(0,0): ", y[0].getElements()[0], "\n");
+    print("F(0,1): ", y[1].getElements()[0], "\n");
+    print("F(1,0): ", y[2].getElements()[0], "\n");
+    print("F(1,1): ", y[3].getElements()[0], "\n");
+}
 
+
+int main(int argc, char const *argv[]) {
+    // testLinearAlgebra();
+    // testLayer();
+    // testSaveLoad();
+    // testForwardBackward();
+    xorNetwork();
     return 0;
 }

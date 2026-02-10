@@ -10,34 +10,45 @@
 #include <stdexcept>
 #include <fstream>
 #include <chrono>
+#include <algorithm>
 
 
 // Constructor/Destructor
-NN::NN(int input_size) : input_size(input_size)
+NN::NN(int input_size, int output_size) : input_size(input_size), output_size(output_size)
 {
+    input_buffer.setSize(input_size);
+    target_buffer.setSize(output_size);
 }
 
-NN::NN(const std::string& model_name, int input_size) : model_name(model_name), input_size(input_size)
+NN::NN(const std::string& model_name, int input_size, int output_size) : 
+    NN(input_size, output_size)
 {
+    this->model_name = model_name;
 }
 
-NN::NN(int input_size, int hidden_layers_number, int hidden_layers_dim, int output_dim) :
+NN::NN(int input_size, int hidden_layers_number, int hidden_layers_dim, int output_size) :
     input_size(input_size),
-    // output_dim(output_dim),
+    output_size(output_size),
     layers_num(hidden_layers_number+1),
     // HL(hidden_layers_dim),
     activation(std::make_unique<BaseActivationFunction>()) 
 {
+    input_buffer.setSize(input_size);
+    target_buffer.setSize(output_size);
+
     int i = 0;
     layers.push_back(DenseLayer(input_size, hidden_layers_dim, SIGMOID, 1));
+    layers[0].preAllocate();
     for(; i < hidden_layers_number - 1; ++i) {
         layers.push_back(DenseLayer(hidden_layers_dim, hidden_layers_dim, SIGMOID, i+2));
+        layers[i].preAllocate();
     }
-    layers.push_back(DenseLayer(hidden_layers_dim, output_dim, SIGMOID, i+2));
+    layers.push_back(DenseLayer(hidden_layers_dim, output_size, SIGMOID, i+2));
+    layers.back().preAllocate();
 }
 
-NN::NN(const std::string& model_name, int input_size, int hidden_layers_number, int hidden_layers_dim, int output_dim) : 
-    NN(input_size, hidden_layers_number, hidden_layers_dim, output_dim)
+NN::NN(const std::string& model_name, int input_size, int hidden_layers_number, int hidden_layers_dim, int output_size) : 
+    NN(input_size, hidden_layers_number, hidden_layers_dim, output_size)
 {
     this->model_name = model_name;
 }
@@ -82,6 +93,7 @@ void NN::addLayer(DenseLayer& layer) {
         }
     }
     layers.push_back(std::move(layer));
+    layers.back().preAllocate();
     layers_num += 1;
 }
 
@@ -96,16 +108,37 @@ void NN::initialize() {
     initialized = true;
 }   
 
-void NN::forward(const Vector& x) { // TODO: RIGHT NOW, ITS SPECIFIC TO XOR MODEL
-    y_predict = layers[0].forward(x);
-    y_predict = layers[1].forward(y_predict);
+void NN::forward(const float* input) {
+    std::copy(input, input + input_size, input_buffer.getElements().begin());
+    this->forward(input_buffer); 
 }
 
-void NN::backward(Vector y_target) {
-    // float dL_ds = loss->grad(y_predict, y_target);
-    // float ds_dl = activation->grad(z_cache);
-    // float grad = dL_ds * ds_dl;
-    // optimizer->update(w, b, grad, last_input, input_size);
+void NN::backward(const float* target) {
+    std::copy(target, target + output_size, target_buffer.getElements().begin());
+    this->backward(target_buffer); 
+}
+
+void NN::forward(const Vector& x) {
+    layers[0].forward(x);
+    for (int l = 1; l<layers_num; l++) {
+        layers[l].forward(layers[l-1].getOutput());
+    }
+    y_predict = layers[layers_num-1].getOutput();
+}
+
+void NN::backward(const Vector& y_target) {  
+    // Vector delta2 = loss->grad(y_predict, y_target) * activation->grad(layers[1].getCache());
+    // optimizer->update(layers[1].getWeights(), layers[1].getBiases(), delta2, layers[1].getInput());
+    // Vector delta1 = layers[1].getWeights().transposedDot(delta2) * activation->grad(layers[0].getCache());
+    // optimizer->update(layers[0].getWeights(), layers[0].getBiases(), delta1, layers[0].getInput());
+    Vector grad = loss->grad(y_predict, y_target);
+    for (int l=layers_num-1; l>=0; l--) {
+        grad = layers[l].backward(grad);
+        optimizer->update(
+            layers[l].getWeights(), layers[l].getBiases(), 
+            layers[l].getDelta(), layers[l].getInput()
+        );
+    }
 }
 
 void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int print_count) {
@@ -122,36 +155,37 @@ void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int pr
     loss_history.reserve(print_count+1);
 
     // Training loop
-    // std::cout << "Training:" << "\n";
-    // for (size_t e = 0; e < epochs; e++) {
-    //     float sample_loss = 0;
-    //     for (size_t i = 0; i < sample_shape.rows; i++) {
-    //         last_input = x_train.getRow(i);
-    //         forward(last_input);
-    //         float y_target = y_train(i, 0);
-    //         backward(y_target);
-    //         sample_loss += loss->call(y_predict, y_target);
-    //     }
-    //     average_loss = sample_loss / sample_shape.rows;
-    //     if (e % print_interval == 0 || e == epochs - 1) { 
-    //         loss_history.push_back(average_loss);
-    //         std::cout << "Epoch: " << (e + 1) << "/" << epochs 
-    //                   << " | Loss: " << average_loss << "\n";
-    //     }
-    // }       
+    std::cout << "Training:" << "\n";
+    for (size_t e = 0; e < epochs; e++) {
+        float sample_loss = 0;
+        for (size_t i = 0; i < sample_shape.rows; i++) {
+            input_ptr = x_train.getRow(i);
+            target_ptr = y_train.getRow(i);
+            forward(input_ptr);
+            backward(target_ptr);
+            sample_loss += (loss->call(y_predict, target_buffer)).accumulate();
+        }
+        average_loss = sample_loss / sample_shape.rows;
+        if (e % print_interval == 0 || e == epochs - 1) { 
+            loss_history.push_back(average_loss);
+            std::cout << "Epoch: " << (e + 1) << "/" << epochs 
+                      << " | Loss: " << average_loss << "\n";
+        }
+    }       
 }
 
-Vector& NN::predict(const std::initializer_list<float>& x)
-{
-    // For tests only
-    if (x.size() != input_size) {
+Vector &NN::predict(Vector &x) {
+    if (x.getSize() != input_size) {
         throw std::invalid_argument("Input size does not match NN dimension!");
     }
-    buffer = x;
-    forward(buffer); 
+    forward(x);
     return y_predict;
 }
 
+Vector& NN::predict(const std::initializer_list<float>& x) { // For tests only
+    input_buffer = x;
+    return this->predict(input_buffer);
+}
 
 // Other methods
 void NN::validateNetwork(const std::string& caller) const {
@@ -221,6 +255,7 @@ void NN::save(const std::string& file_name) {
         std::cerr << "Error: Could not open file for saving!" << std::endl;
     } else {
         file << std::format("MODEL {}\n", this->model_name);
+        file << std::format("I/O DIM {} {}\n", this->input_size, this->output_size);
         file << std::format("LAYER COUNT {}\n", this->layers_num);
         file << std::format("INITIALIZER {}\n", initializer->getName());
         file << std::format("LOSS {}\n", loss->getName());
@@ -253,6 +288,12 @@ inline void NN::auxiliaryOptimizerGenerator(std::string& buffer, float lr) {
     // else if (buffer == "ADAM") setOptimizer(ADAM);
 }
 
+inline void NN::auxiliaryPreAllocatorFunction() {
+    input_buffer.setSize(input_size);
+    target_buffer.setSize(output_size);
+    y_predict.setSize(output_size);
+}
+
 void NN::load(const std::string &file_name) {
     std::ifstream file(file_name);
     if (!file.is_open()) {
@@ -264,7 +305,9 @@ void NN::load(const std::string &file_name) {
     
     // Summary
     file >> buffer >> model_name; // MODEL {NAME}
+    file >> buffer >> buffer >> input_size >> output_size; // I/O DIM {} {}
     file >> buffer >> buffer >> layers_num; // LAYER COUNT {NUMBER}
+    auxiliaryPreAllocatorFunction();
     
     // Initialization Function
     file >> buffer >> buffer; // INITIALIZER {FUNCTION}

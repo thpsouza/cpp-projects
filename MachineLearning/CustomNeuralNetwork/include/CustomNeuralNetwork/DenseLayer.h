@@ -12,6 +12,7 @@
 // Forward declarations
 class BaseActivationFunction;
 class BaseInitializationFunction;
+class BaseOptimizer;
 
 
 // Implementation
@@ -20,14 +21,14 @@ private:
     int layer_id;
     int input_dim;
     int output_dim;
-    std::unique_ptr<BaseActivationFunction> activation;    
-    Vector z_cache;
-    Vector last_input;
+    std::unique_ptr<BaseActivationFunction> activation;
+    Vector x;    
     Matrix w; 
     Vector b;
+    Vector z;
     Vector y;
+    Vector delta;
     void auxiliaryActivationGenerator(std::string &buffer);
-
     
 public:
     // Constructor/Destructor
@@ -43,20 +44,27 @@ public:
     const std::unique_ptr<BaseActivationFunction>& getActivationFunction() const;
     int getInputDim() const;
     int getOutputDim() const;
+    const Vector& getInput() const;
     const Matrix& getWeights() const;
     const Vector& getBiases() const;
+    const Vector& getCache() const;
     const Vector& getOutput() const;
+    const Vector& getDelta() const;
+    Vector& getInput();
     Matrix& getWeights();
     Vector& getBiases();
+    Vector& getCache();
     Vector& getOutput();
+    Vector& getDelta();
 
     // Methods
+    void preAllocate();
     void initialize(BaseInitializationFunction* initializer);
     Vector forward(const Vector& x);
-    void backward(float y_target);
+    Vector backward(const Vector& last_grad);
     void print() const;
     void save(std::ostream& output);
-    void load(std::istream &input);
+    void load(std::istream& input);
 };
 
 
