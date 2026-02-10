@@ -20,5 +20,5 @@ Vector MeanSquaredErrorLossFunction::call(const Vector& y_predict, const Vector&
 }
 
 Vector MeanSquaredErrorLossFunction::grad(const Vector& y_predict, const Vector& y_target) const {
-    return (y_predict - y_target) * 2.0f;
+    return linalg::transform(y_predict, y_target, [](float p, float t) { return 2.0f*(p - t); });
 }
