@@ -4,6 +4,7 @@
 #include <CustomNeuralNetwork/InitializationFunctions/InitializationFunctions.h>
 #include <CustomNeuralNetwork/LossFunctions/LossFunctions.h>
 #include <CustomNeuralNetwork/Optimizers/Optimizers.h>
+#include <LinearAlgebra/LinAlg.h>
 
 #include <iostream>
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 #include <fstream>
 #include <chrono>
 #include <algorithm>
+#include <cctype>
 
 
 // Constructor/Destructor
@@ -20,16 +22,10 @@ NN::NN(int input_size, int output_size) : input_size(input_size), output_size(ou
     target_buffer.setSize(output_size);
 }
 
-NN::NN(const std::string& model_name, int input_size, int output_size) : 
-    NN(input_size, output_size)
-{
-    this->model_name = model_name;
-}
-
-NN::NN(int input_size, int hidden_layers_number, int hidden_layers_dim, int output_size) :
+NN::NN(int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size) :
     input_size(input_size),
     output_size(output_size),
-    layers_num(hidden_layers_number+1),
+    layers_num(hidden_layers_num+1),
     // HL(hidden_layers_dim),
     activation(std::make_unique<BaseActivationFunction>()) 
 {
@@ -39,7 +35,7 @@ NN::NN(int input_size, int hidden_layers_number, int hidden_layers_dim, int outp
     int i = 0;
     layers.push_back(DenseLayer(input_size, hidden_layers_dim, SIGMOID, 1));
     layers[0].preAllocate();
-    for(; i < hidden_layers_number - 1; ++i) {
+    for(; i < hidden_layers_num - 1; ++i) {
         layers.push_back(DenseLayer(hidden_layers_dim, hidden_layers_dim, SIGMOID, i+2));
         layers[i].preAllocate();
     }
@@ -47,11 +43,58 @@ NN::NN(int input_size, int hidden_layers_number, int hidden_layers_dim, int outp
     layers.back().preAllocate();
 }
 
-NN::NN(const std::string& model_name, int input_size, int hidden_layers_number, int hidden_layers_dim, int output_size) : 
-    NN(input_size, hidden_layers_number, hidden_layers_dim, output_size)
+NN::NN(const std::string &model_name, int input_size, int output_size) : 
+    NN(input_size, output_size)
 {
     this->model_name = model_name;
 }
+    
+NN::NN(int input_size, int output_size, std::string problem_type) :
+    NN(input_size, output_size)
+{
+    std::transform(problem_type.begin(), problem_type.end(), problem_type.begin(), ::toupper);
+    if (problem_type != "REGRESSION" && problem_type != "CLASSIFICATION") {
+        std::cerr << "Warning: the problem type must be either 'REGRESSION' or 'CLASSIFICATION'. " << "\n"
+        << std::format("You passed: '{}'", problem_type) << "\n"
+        << "Continuing with regression mode by default..." << "\n"; 
+        problem_type = "REGRESSION";
+    }
+    this->problem_type = problem_type;
+}
+
+NN::NN(const std::string &model_name, int input_size, int output_size, std::string problem_type) :
+    NN(input_size, output_size, problem_type)
+{
+    this->model_name = model_name;
+}
+
+
+NN::NN(const std::string &model_name, int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size) : 
+    NN(input_size, hidden_layers_num, hidden_layers_dim, output_size)
+{
+    this->model_name = model_name;
+}
+
+NN::NN(int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size, std::string problem_type) :
+    NN(input_size, hidden_layers_num, hidden_layers_dim, output_size)    
+{
+    std::transform(problem_type.begin(), problem_type.end(), problem_type.begin(), ::toupper);
+    if (problem_type != "REGRESSION" && problem_type != "CLASSIFICATION") {
+        std::cerr << "Warning: the problem type must be either 'REGRESSION' or 'CLASSIFICATION'. " << "\n"
+        << std::format("You passed: '{}'", problem_type) << "\n"
+        << "Continuing with regression mode by default..." << "\n"; 
+        problem_type = "REGRESSION";
+    }
+    this->problem_type = problem_type;
+}
+
+NN::NN(const std::string &model_name, int input_size, int hidden_layers_num, int hidden_layers_dim, int output_size,
+            std::string problem_type) :
+    NN(input_size, hidden_layers_num, hidden_layers_dim, output_size, problem_type)    
+{
+    this->model_name = model_name;
+}
+    
 
 // Getters/Setters
 const Vector& NN::getOutput() const {
@@ -86,7 +129,7 @@ void NN::setOptimizer(std::unique_ptr<BaseOptimizer> opt, float learning_rate) {
 
 
 // Network Methods
-void NN::addLayer(DenseLayer& layer) {
+void NN::addLayer(DenseLayer &layer) {
     if (!layers.empty()) {
         if (layer.getInputDim() != layers.back().getOutputDim()) {
             throw std::invalid_argument("Layer input dimension must match previous layer output dimension!");
@@ -102,23 +145,23 @@ void NN::initialize() {
     if (!initializer) {
         throw std::runtime_error("No initialization function set! Use setInitializationFunction() before calling initialize().");
     }
-    for (auto& layer : layers) {
+    for (auto &layer : layers) {
         layer.initialize(initializer.get());
     }
     initialized = true;
 }   
 
-void NN::forward(const float* input) {
+void NN::forward(const float *input) {
     std::copy(input, input + input_size, input_buffer.getElements().begin());
     this->forward(input_buffer); 
 }
 
-void NN::backward(const float* target) {
+void NN::backward(const float *target) {
     std::copy(target, target + output_size, target_buffer.getElements().begin());
     this->backward(target_buffer); 
 }
 
-void NN::forward(const Vector& x) {
+void NN::forward(const Vector &x) {
     layers[0].forward(x);
     for (int l = 1; l<layers_num; l++) {
         layers[l].forward(layers[l-1].getOutput());
@@ -126,7 +169,7 @@ void NN::forward(const Vector& x) {
     y_predict = layers[layers_num-1].getOutput();
 }
 
-void NN::backward(const Vector& y_target) {  
+void NN::backward(const Vector &y_target) {  
     // Vector delta2 = loss->grad(y_predict, y_target) * activation->grad(layers[1].getCache());
     // optimizer->update(layers[1].getWeights(), layers[1].getBiases(), delta2, layers[1].getInput());
     // Vector delta1 = layers[1].getWeights().transposedDot(delta2) * activation->grad(layers[0].getCache());
@@ -174,7 +217,43 @@ void NN::fit(const Matrix &x_train, const Matrix &y_train, size_t epochs, int pr
     }       
 }
 
-Vector &NN::predict(Vector &x) {
+float NN::evaluate(const Matrix &x_test, const Matrix &y_test) { 
+    validateNetwork("evaluate");
+
+    size_t N = x_test.getShape().rows;
+    if (problem_type == "REGRESSION") {
+        float total_loss = 0;
+        for (size_t i = 0; i < N; i++) {
+            input_ptr = x_test.getRow(i);
+            target_ptr = y_test.getRow(i);
+            forward(input_ptr);
+            std::copy(target_ptr, target_ptr + output_size, target_buffer.getElements().begin());
+            total_loss += (loss->call(y_predict, target_buffer)).accumulate();
+        }
+        return total_loss/N;
+    }
+    else if (problem_type == "CLASSIFICATION") {
+        for (size_t i = 0; i < N; i++) {
+            input_ptr = x_test.getRow(i);
+            target_ptr = y_test.getRow(i);
+            forward(input_ptr);
+            std::copy(target_ptr, target_ptr + output_size, target_buffer.getElements().begin());
+            if (output_size > 1) {
+                if (linalg::argmax(y_predict) == linalg::argmax(target_buffer)) {
+                    accuracy+=1;
+                }
+            } else if ((y_predict[0] >= 0.5f ? 1.0f : 0.0f) == target_buffer[0]) {
+                accuracy+=1;
+            }
+    
+        }
+        return accuracy/N;
+    }
+    return 0.0f;
+}
+
+Vector& NN::predict(Vector &x) {
+    validateNetwork("predict");
     if (x.getSize() != input_size) {
         throw std::invalid_argument("Input size does not match NN dimension!");
     }
@@ -182,13 +261,13 @@ Vector &NN::predict(Vector &x) {
     return y_predict;
 }
 
-Vector& NN::predict(const std::initializer_list<float>& x) { // For tests only
+Vector& NN::predict(const std::initializer_list<float> &x) { // For tests only
     input_buffer = x;
     return this->predict(input_buffer);
 }
 
 // Other methods
-void NN::validateNetwork(const std::string& caller) const {
+void NN::validateNetwork(const std::string &caller) const {
     if (layers.empty()) {
         throw std::runtime_error(
             std::format("No layers were added. Use addLayer() before calling {}().", caller)
@@ -222,11 +301,13 @@ void NN::validateNetwork(const std::string& caller) const {
 void NN::print() const {
     validateNetwork("print");
     std::cout << "\n========================================\n";
-    std::cout << std::format("NEURAL NETWORK SUMMARY: {}\n", model_name.empty() ? "Unnamed" : model_name);
-    std::cout << std::format("LAYER COUNT {}\n", this->layers_num);
-    std::cout << std::format("INITIALIZER {}\n", initializer->getName());
-    std::cout << std::format("LOSS {}\n", loss->getName());
-    std::cout << std::format("OPTIMIZER {} {}\n", optimizer->getName(), optimizer->getLearningRate());
+    std::cout << std::format("NEURAL NETWORK SUMMARY: {} ({} -> {})\n", 
+        model_name.empty() ? "Unnamed" : model_name, input_size, output_size);
+    std::cout << std::format("PROBLEM TYPE: {}\n", this->problem_type);
+    std::cout << std::format("LAYER COUNT: {}\n", this->layers_num);
+    std::cout << std::format("INITIALIZER: {}\n", initializer->getName());
+    std::cout << std::format("LOSS: {}\n", loss->getName());
+    std::cout << std::format("OPTIMIZER: {} (lr = {})\n", optimizer->getName(), optimizer->getLearningRate());
     std::cout << "========================================\n";
     
     if (layers.empty()) {
@@ -235,7 +316,7 @@ void NN::print() const {
         for (auto& layer : layers) {
             layer.print();
             std::cout << "\n";
-            // std::cout << "===============================\n";
+            // std::cout << "- - - - - - - - - - - - - - - - - - - -\n";
         }
     }
     
@@ -248,13 +329,14 @@ void NN::save() {
     this->save(file_name);
 }
 
-void NN::save(const std::string& file_name) {
+void NN::save(const std::string &file_name) {
     validateNetwork("save");
     std::ofstream file(file_name);
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file for saving!" << std::endl;
     } else {
         file << std::format("MODEL {}\n", this->model_name);
+        file << std::format("PROBLEM {}\n", this->model_name, this->problem_type);
         file << std::format("I/O DIM {} {}\n", this->input_size, this->output_size);
         file << std::format("LAYER COUNT {}\n", this->layers_num);
         file << std::format("INITIALIZER {}\n", initializer->getName());
@@ -270,19 +352,19 @@ void NN::save(const std::string& file_name) {
 }
 
 
-inline void NN::auxiliaryInitializerGenerator(std::string& buffer) {
+inline void NN::auxiliaryInitializerGenerator(std::string &buffer) {
     // Handle activation (MAY BE MOVED TO ITS OWN GENERATOR CLASS)
     if (buffer == "RANDOM") setInitializationFunction(RANDOM);
     else if (buffer == "XAVIER") setInitializationFunction(XAVIER);
     else if (buffer == "HE") setInitializationFunction(HE);
 }
 
-inline void NN::auxiliaryLossGenerator(std::string& buffer) {
+inline void NN::auxiliaryLossGenerator(std::string &buffer) {
     // Handle activation (MAY BE MOVED TO ITS OWN GENERATOR CLASS)
     if (buffer == "MSE") setLossFunction(MSE);
 }
 
-inline void NN::auxiliaryOptimizerGenerator(std::string& buffer, float lr) {
+inline void NN::auxiliaryOptimizerGenerator(std::string &buffer, float lr) {
     // Handle activation (MAY BE MOVED TO ITS OWN GENERATOR CLASS)
     if (buffer == "SGD") setOptimizer(SGD, lr);
     // else if (buffer == "ADAM") setOptimizer(ADAM);
@@ -305,6 +387,7 @@ void NN::load(const std::string &file_name) {
     
     // Summary
     file >> buffer >> model_name; // MODEL {NAME}
+    file >> buffer >> problem_type; // PROBLEM {TYPE}
     file >> buffer >> buffer >> input_size >> output_size; // I/O DIM {} {}
     file >> buffer >> buffer >> layers_num; // LAYER COUNT {NUMBER}
     auxiliaryPreAllocatorFunction();
