@@ -15,10 +15,11 @@ float MeanSquaredErrorLossFunction::grad(float y_predict, float y_target) const 
     return 2.0f * (y_predict - y_target);
 }
 
-Vector MeanSquaredErrorLossFunction::call(const Vector& y_predict, const Vector& y_target) const {
-    return linalg::pow(y_target - y_predict, 2);
+Vector MeanSquaredErrorLossFunction::call(const Vector &y_predict, const Vector &y_target) const {
+    // return linalg::pow(y_target - y_predict, 2);
+    return linalg::transform(y_predict, y_target, [](float p, float t) { return pow(t - p, 2); });
 }
 
-Vector MeanSquaredErrorLossFunction::grad(const Vector& y_predict, const Vector& y_target) const {
+Vector MeanSquaredErrorLossFunction::grad(const Vector &y_predict, const Vector &y_target) const {
     return linalg::transform(y_predict, y_target, [](float p, float t) { return 2.0f*(p - t); });
 }
