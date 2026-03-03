@@ -26,40 +26,54 @@ A C++ neural network framework built from scratch using the LinearAlgebra librar
 ## 📁 Project Structure
 
 ```
-CustomNeuralNetwork/
-├── README.md
-├── include/
-│   └── CustomNeuralNetwork/
-│       ├── NN.h
-│       ├── DenseLayer.h
-│       ├── ActivationFunctions/
-│       │   ├── ActivationFunctions.h
-│       │   ├── BaseActivationFunction.h
-│       │   ├── ReLUActivationFunction.h
-│       │   ├── SigmoidActivationFunction.h
-│       │   └── TanhActivationFunction.h
-│       ├── LossFunctions/
-│       │   ├── LossFunctions.h
-│       │   ├── BaseLossFunction.h
-│       │   └── MeanSquaredErrorLossFunction.h
-│       └── Optimizers/
-│           ├── Optimizers.h
-│           ├── BaseOptimizer.h
-│           └── StochasticGDOptimizer.h
-└── src/
-    ├── NN.cpp
-    ├── DenseLayer.cpp
-    ├── ActivationFunctions/
-    │   ├── BaseActivationFunction.cpp
-    │   ├── ReLUActivationFunction.cpp
-    │   ├── SigmoidActivationFunction.cpp
-    │   └── TanhActivationFunction.cpp
-    ├── LossFunctions/
-    │   ├── BaseLossFunction.cpp
-    │   └── MeanSquaredErrorLossFunction.cpp
-    └── Optimizers/
-        ├── BaseOptimizer.cpp
-        └── StochasticGDOptimizer.cpp
+MachineLearning/
+└── CustomNeuralNetwork/
+    ├── README.md
+    ├── include/
+    │   └── CustomNeuralNetwork/
+    │       ├── NN.h
+    │       ├── DenseLayer.h
+    │       ├── ActivationFunctions/
+    │       │   ├── ActivationFunctions.h
+    │       │   ├── BaseActivationFunction.h
+    │       │   ├── ReLUActivationFunction.h
+    │       │   ├── SigmoidActivationFunction.h
+    │       │   └── TanhActivationFunction.h
+    │       ├── InitializationFunctions/
+    │       │   ├── InitializationFunctions.h
+    │       │   ├── BaseInitializationFunction.h
+    │       │   ├── RandomInitializationFunction.h
+    │       │   ├── HeInitializationFunction.h
+    │       │   └── XavierInitializationFunction.h
+    │       ├── LossFunctions/
+    │       │   ├── LossFunctions.h
+    │       │   ├── BaseLossFunction.h
+    │       │   └── MeanSquaredErrorLossFunction.h
+    │       └── Optimizers/
+    │           ├── Optimizers.h
+    │           ├── BaseOptimizer.h
+    │           ├── AdaptativeMomentOptimizer.cpp (NOT IMPLEMENTED YET)
+    │           └── StochasticGDOptimizer.h
+    └── src/
+        ├── NN.cpp
+        ├── DenseLayer.cpp
+        ├── ActivationFunctions/
+        │   ├── BaseActivationFunction.cpp
+        │   ├── ReLUActivationFunction.cpp
+        │   ├── SigmoidActivationFunction.cpp
+        │   └── TanhActivationFunction.cpp
+        ├── InitializationFunctions/
+        │   ├── BaseInitializationFunction.cpp
+        │   ├── RandomInitializationFunction.cpp
+        │   ├── HeInitializationFunction.cpp
+        │   └── XavierInitializationFunction.cpp
+        ├── LossFunctions/
+        │   ├── BaseLossFunction.cpp
+        │   └── MeanSquaredErrorLossFunction.cpp
+        └── Optimizers/
+            ├── BaseOptimizer.cpp
+            ├── AdaptativeMomentOptimizer.cpp (NOT IMPLEMENTED YET)
+            └── StochasticGDOptimizer.cpp
 ```
 
 
