@@ -124,6 +124,6 @@ cmake --build . --config Release
 ## API Documentation
 
 See the inline documentation in:
-- [Matrix.h](include/linalg/Matrix.h) - Main matrix class
-- [Vector.h](include/linalg/Vector.h) - Vector specialization
-- [Shape.h](include/linalg/Shape.h) - Shape management
+- [Matrix.h](include/LinearAlgebra/Matrix.h) - Main matrix class
+- [Vector.h](include/LinearAlgebra/Vector.h) - Vector specialization
+- [Shape.h](include/LinearAlgebra/Shape.h) - Shape management
