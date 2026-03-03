@@ -10,8 +10,11 @@
 build/
 dist/
 *.out
+*.txt 
 
-*.txt
+# Others
+!models/XorModel.txt
+Examples
 
 # VS Code
 .vscode/
