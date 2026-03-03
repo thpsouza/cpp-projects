@@ -78,7 +78,9 @@ namespace linalg {
     Vector<T> pow(const Vector<T>& m, T n);
     template <typename T>
     Vector<T> pow(const Vector<T>& m, int n);
-
+    
+    template <typename T>
+    size_t argmax(const Vector<T> &v);
     
     // Unary
     template <typename T, typename Func>

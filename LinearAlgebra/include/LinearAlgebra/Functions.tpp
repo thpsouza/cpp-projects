@@ -61,7 +61,20 @@ namespace linalg {
     Vector<T> pow(const Vector<T>& v, int n) {
         return transform(v, [n](T x) { return std::pow(x, n); });
     }
-
+    
+    template <typename T>
+    size_t argmax(const Vector<T> &v) { 
+        size_t idx = 0;
+        T max = v[0]; 
+        for (size_t i = 1; i < v.getSize(); i++) {
+            T current = v[i];
+            idx = i;
+            if (current > max) {
+                max = current;
+            }
+        }
+        return idx;        
+    }
 
     // Unary transform
     template <typename T, typename Func>
