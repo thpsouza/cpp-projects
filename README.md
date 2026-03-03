@@ -9,6 +9,8 @@ cpp-projects/
 ├── README.md
 ├── build.ps1                          (Build script)
 ├── main.cpp                           (Entry point)
+├── models/
+│   └── XorModel.txt                   (Testing model)
 ├── LinearAlgebra/
 │   ├── README.md
 │   ├── include/
@@ -22,7 +24,7 @@ cpp-projects/
 │       └── Shape.cpp
 │
 ├── MachineLearning/
-│    └── CustomNeuralNetwork/
+│   └── CustomNeuralNetwork/
 │        ├── README.md
 │        ├── include/
 │        │   └── CustomNeuralNetwork/
@@ -37,6 +39,7 @@ cpp-projects/
 │        │       ├── InitializationFunctions/
 │        │       │   ├── InitializationFunctions.h
 │        │       │   ├── BaseInitializationFunction.h
+│        │       │   ├── RandomInitializationFunction.h
 │        │       │   ├── HeInitializationFunction.h
 │        │       │   └── XavierInitializationFunction.h
 │        │       ├── LossFunctions/
@@ -56,10 +59,11 @@ cpp-projects/
 │            │   ├── ReLUActivationFunction.cpp
 │            │   ├── SigmoidActivationFunction.cpp
 │            │   └── TanhActivationFunction.cpp
-│            │       ├── InitializationFunctions/
-│            │       │   ├── BaseInitializationFunction.cpp
-│            │       │   ├── HeInitializationFunction.cpp
-│            │       │   └── XavierInitializationFunction.cpp
+│            ├── InitializationFunctions/
+│            │   ├── BaseInitializationFunction.cpp
+│            │   ├── RandomInitializationFunction.cpp
+│            │   ├── HeInitializationFunction.cpp
+│            │   └── XavierInitializationFunction.cpp
 │            ├── LossFunctions/
 │            │   ├── BaseLossFunction.cpp
 │            │   └── MeanSquaredErrorLossFunction.cpp
