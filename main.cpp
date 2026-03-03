@@ -112,7 +112,7 @@ void xorNetwork() {
     float learning_rate = 1e-1;
     int epochs = 1e6;
 
-    NN model("Xor", input_dim, hidden_layers, hidden_layers_dim, output_dim);
+    // NN model("Xor", input_dim, hidden_layers, hidden_layers_dim, output_dim, "classification");
     // model.setInitializationFunction(RANDOM);
     // model.setActivationFunction(SIGMOID);
     // model.setLossFunction(MSE);
@@ -120,9 +120,10 @@ void xorNetwork() {
     // model.initialize();
     // model.print(); print("\n");
     // model.fit(x_train, y_train, epochs);
-    // model.save("XorModel.txt");
-    model = NN();
-    model.load("XorModel.txt");
+    // model.save("models/XorModel.txt");
+
+    NN model = NN();
+    model.load("models/XorModel.txt");
     model.print();
     
     Vector y[4];
@@ -138,11 +139,33 @@ void xorNetwork() {
 }
 
 
+void testEvaluate() {
+    Matrix x_test({
+        {0, 0},
+        {1, 0},
+        {0, 1},
+        {1, 1}
+    });
+    Matrix y_test({
+        {0}, 
+        {1}, 
+        {1}, 
+        {0} 
+    });
+    NN model = NN();
+    model.load("models/XorModel.txt");
+    model.print();
+    float score = model.evaluate(x_test, y_test);
+    print("NN score: ", score, "\n");
+}
+
+
 int main(int argc, char const *argv[]) {
     // testLinearAlgebra();
     // testLayer();
     // testSaveLoad();
     // testForwardBackward();
-    xorNetwork();
+    // xorNetwork();
+    testEvaluate(); 
     return 0;
 }
