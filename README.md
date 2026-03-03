@@ -149,10 +149,9 @@ A lightweight linear algebra library with Matrix and Vector support.
 A neural network framework built from scratch using the LinearAlgebra library.
 
 **Features:**
-- ✅ Single neuron architecture (expandable)
 - ✅ Multiple activation functions (ReLU, Sigmoid, Tanh)
 - ✅ Loss functions (Mean Squared Error)
-- ✅ Optimizers (Stochastic Gradient Descent)
+- ✅ Optimizers (Stochastic Gradient Descent, ADAM)
 - ✅ Forward & backward propagation
 - ✅ Training with fit() method
 
@@ -243,4 +242,4 @@ MIT License - Feel free to use for learning purposes.
 ## 👤 Author
 
 Created by Thiago Souza - July 2024
-Last Updated: 2026-01-31
+Last Updated: 2026-03-03
