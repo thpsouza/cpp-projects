@@ -209,6 +209,8 @@ network.fit(x_train, y_train, epochs);
 float prediction = network.predict({1.0f, 1.0f});
 std::cout << "Prediction: " << prediction << std::endl;
 ```
+Currently, there are more examples in:
+- [main.cpp](main.cpp)
 
 ## 🔧 Development Notes
 
