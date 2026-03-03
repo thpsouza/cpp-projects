@@ -29,13 +29,18 @@ LinearAlgebra/
 ├── include/
 │   └── LinearAlgebra/
 │       ├── LinAlg.h               (Main header - include this)
+│       ├── LinAlgFwds.h           (Forward declarations)
 │       ├── Matrix.h               (Matrix class)
+│       ├── Matrix.tpp
 │       ├── Vector.h               (Vector class)
+│       ├── Vector.tpp
 |       ├── MatrixErrors.h         (Custom error classes)
 │       ├── Shape.h                (Shape validation)
-│       └── Functions.h            (Utility functions)
+│       ├── Shape.tpp
+│       ├── Functions.h            (Utility functions)
+│       └── Functions.tpp
 └── src/
-    ├── Shape.cpp
+    └── Shape.cpp
 ```
 
 
